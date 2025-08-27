@@ -20,10 +20,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildFeatures {
-        buildConfig = true // Ensure this is true or not set (as true is default)
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = false

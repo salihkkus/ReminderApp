@@ -1,9 +1,11 @@
 package com.example.reminderapp.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reminderapp.data.api.BilsoftApiService
 import com.example.reminderapp.data.model.LoginRequest
+import com.example.reminderapp.data.model.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,71 +32,102 @@ class LoginViewModel @Inject constructor(
         apiKullaniciSifre: String
     ) {
         // Input validation
-        if (vergiNumarasi.isBlank()) {
-            _loginState.value = LoginState(error = "Vergi numarası boş olamaz")
-            return
-        }
-        
-        if (kullaniciAdi.isBlank()) {
-            _loginState.value = LoginState(error = "Kullanıcı adı boş olamaz")
-            return
-        }
-        
-        if (kullaniciSifre.isBlank()) {
-            _loginState.value = LoginState(error = "Şifre boş olamaz")
-            return
-        }
-        
-        // Email format validation
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(kullaniciAdi).matches()) {
-            _loginState.value = LoginState(error = "Geçerli bir e-posta adresi girin")
+        if (vergiNumarasi.isBlank() || kullaniciAdi.isBlank() || kullaniciSifre.isBlank()) {
+            _loginState.value = LoginState(error = "Lütfen tüm alanları doldurun")
             return
         }
         
         viewModelScope.launch {
-            _loginState.value = LoginState(isLoading = true, error = null)
-            
             try {
+                Log.d("LoginViewModel", "Login attempt started")
+                _loginState.value = LoginState(isLoading = true, error = null)
+                
                 val loginRequest = LoginRequest(
                     vergiNumarasi = vergiNumarasi.trim(),
                     kullaniciAdi = kullaniciAdi.trim(),
-                    kullaniciSifre = kullaniciSifre,
-                    veritabaniAd = veritabaniAd,
-                    donemYil = donemYil,
-                    subeAd = subeAd,
-                    apiKullaniciAdi = apiKullaniciAdi,
-                    apiKullaniciSifre = apiKullaniciSifre
+                    kullaniciSifre = kullaniciSifre.trim(),
+                    veritabaniAd = veritabaniAd.trim(),
+                    donemYil = donemYil.trim(),
+                    subeAd = subeAd.trim(),
+                    apiKullaniciAdi = apiKullaniciAdi.trim(),
+                    apiKullaniciSifre = apiKullaniciSifre.trim()
                 )
                 
+                Log.d("LoginViewModel", "Sending login request to API")
                 val response = apiService.login(loginRequest)
                 
-                if (response.success && response.token != null) {
-                    // Store token securely (you might want to use DataStore or EncryptedSharedPreferences)
-                    _loginState.value = LoginState(isSuccess = true)
-                } else {
+                Log.d("LoginViewModel", "API Response: success=${response.success}, message=${response.message}")
+                
+                if (response.success == true && response.data?.token != null) {
+                    Log.d("LoginViewModel", "Login successful, token received")
                     _loginState.value = LoginState(
-                        error = response.message ?: "Giriş başarısız. Bilgilerinizi kontrol edin."
+                        isSuccess = true,
+                        token = response.data.token,
+                        userInfo = response.data.userInfo
+                    )
+                    Log.d("LoginViewModel", "Login state updated to success")
+                } else {
+                    // API'den gelen hata mesajını göster
+                    val errorMessage = response.message ?: "Giriş başarısız"
+                    Log.d("LoginViewModel", "Login failed: $errorMessage")
+                    _loginState.value = LoginState(
+                        error = errorMessage,
+                        apiCode = response.code
                     )
                 }
             } catch (e: Exception) {
+                Log.e("LoginViewModel", "Login error", e)
+                val errorMessage = when (e) {
+                    is java.net.UnknownHostException -> "İnternet bağlantısı yok"
+                    is java.net.SocketTimeoutException -> "Bağlantı zaman aşımı"
+                    is retrofit2.HttpException -> "Sunucu hatası: ${e.code()}"
+                    else -> "Bağlantı hatası: ${e.message ?: "Bilinmeyen hata"}"
+                }
+                _loginState.value = LoginState(error = errorMessage)
+            }
+        }
+    }
+    
+    // Test için mock login (API çalışmazsa kullan)
+    fun testLogin() {
+        Log.d("LoginViewModel", "Test login triggered")
+        viewModelScope.launch {
+            try {
+                _loginState.value = LoginState(isLoading = true, error = null)
+                
+                // Simulate API delay
+                kotlinx.coroutines.delay(1000)
+                
+                // Mock successful response
                 _loginState.value = LoginState(
-                    error = "Bağlantı hatası: ${e.message ?: "Bilinmeyen hata"}"
+                    isSuccess = true,
+                    token = "test_token_12345",
+                    userInfo = UserInfo(
+                        userId = "test_user_123",
+                        userName = "Test Kullanıcı",
+                        email = "test@example.com"
+                    )
                 )
+                
+                Log.d("LoginViewModel", "Test login successful")
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Test login error", e)
+                _loginState.value = LoginState(error = "Test giriş hatası: ${e.message}")
             }
         }
     }
     
     fun resetState() {
+        Log.d("LoginViewModel", "Resetting login state")
         _loginState.value = LoginState()
-    }
-    
-    fun clearError() {
-        _loginState.value = _loginState.value.copy(error = null)
     }
 }
 
 data class LoginState(
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val token: String? = null,
+    val userInfo: com.example.reminderapp.data.model.UserInfo? = null,
+    val apiCode: String? = null
 )

@@ -1,8 +1,6 @@
 package com.example.reminderapp.di
 
 import com.example.reminderapp.data.api.BilsoftApiService
-import com.example.reminderapp.data.local.AppDatabase
-import com.example.reminderapp.data.local.ReminderDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,7 +31,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://apiv3.bilsoft.com/")
+            .baseUrl("https://apiv3.bilsoft.com/api/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -43,18 +41,5 @@ object NetworkModule {
     @Singleton
     fun provideBilsoftApiService(retrofit: Retrofit): BilsoftApiService {
         return retrofit.create(BilsoftApiService::class.java)
-    }
-    
-    @Provides
-    @Singleton
-    fun provideAppDatabase(): AppDatabase {
-        // This will be provided by the Application class
-        throw UnsupportedOperationException("AppDatabase should be provided by Application class")
-    }
-    
-    @Provides
-    @Singleton
-    fun provideReminderDao(database: AppDatabase): ReminderDao {
-        return database.reminderDao()
     }
 }

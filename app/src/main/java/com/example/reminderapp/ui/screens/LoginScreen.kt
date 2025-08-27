@@ -12,26 +12,44 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.reminderapp.ui.theme.ReminderappTheme
-import com.example.reminderapp.BuildConfig
+import com.example.reminderapp.ui.viewmodels.LoginViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
-    // Sadece kullanıcıdan istenen alanlar
-    var vergiNumarasi by remember { mutableStateOf("") }
-    var kullaniciAdi by remember { mutableStateOf("") }
-    var kullaniciSifre by remember { mutableStateOf("") }
+    var vergiNumarasi by remember { mutableStateOf("0123456010") }
+    var kullaniciAdi by remember { mutableStateOf("sskarakussalih77@gmail.com") }
+    var kullaniciSifre by remember { mutableStateOf("04a7b4c1") }
+    var veritabaniAd by remember { mutableStateOf("0123456010") }
+    var donemYil by remember { mutableStateOf("2025") }
+    var subeAd by remember { mutableStateOf("Merkez") }
+    var apiKullaniciAdi by remember { mutableStateOf("BLS-d475b5037621") }
+    var apiKullaniciSifre by remember { mutableStateOf("e9d251eb-8d86-4e83-95d5-7163f141f8d3") }
     
-    // API için gerekli olan ama kullanıcıdan gizlenen alanlar
-    val veritabaniAd = "0123456010"
-    val donemYil = "2025"
-    val subeAd = "Merkez"
-    val apiKullaniciAdi = "BLS-d475b5037621"
-    val apiKullaniciSifre = "e9d251eb-8d86-4e83-95d5-7163f141f8d3"
+    val loginState by viewModel.loginState.collectAsState()
+    
+    // Giriş başarılı olduğunda navigation
+    LaunchedEffect(loginState) {
+        if (loginState.isSuccess) {
+            try {
+                // Başarı mesajını göstermek için kısa bir gecikme
+                delay(1500)
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
+            } catch (e: Exception) {
+                // Navigation hatası durumunda log
+                android.util.Log.e("LoginScreen", "Navigation error", e)
+            }
+        }
+    }
     
     Column(
         modifier = Modifier
@@ -39,166 +57,231 @@ fun LoginScreen(
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Logo ve başlık alanı
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Logo placeholder (gerçek logoyla değiştirilebilir)
-            Surface(
-                modifier = Modifier.size(80.dp),
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.primaryContainer
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "B",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-            
-            Text(
-                text = "Bilsoft Ajanda Modülü",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-            
-            Text(
-                text = "Giriş yaparak hatırlatmalarınızı yönetin",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-        }
-        
-        // Giriş formu
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Giriş Bilgileri",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                
-                OutlinedTextField(
-                    value = vergiNumarasi,
-                    onValueChange = { vergiNumarasi = it },
-                    label = { Text("Vergi Numarası") },
-                    placeholder = { Text("Örn: 0123456010") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true
-                )
-                
-                OutlinedTextField(
-                    value = kullaniciAdi,
-                    onValueChange = { kullaniciAdi = it },
-                    label = { Text("Kullanıcı Adı") },
-                    placeholder = { Text("E-posta adresiniz") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    singleLine = true
-                )
-                
-                OutlinedTextField(
-                    value = kullaniciSifre,
-                    onValueChange = { kullaniciSifre = it },
-                    label = { Text("Şifre") },
-                    placeholder = { Text("Şifrenizi girin") },
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    singleLine = true
-                )
-                
-                Button(
-                    onClick = {
-                        // Şu an için doğrudan ana sayfaya yönlendiriyoruz
-                        // API entegrasyonu tamamlandığında bu kısmı tekrar aktif edeceğiz
-                        navController.navigate("home") {
-                            popUpTo("login") { inclusive = true }
-                        }
-                        
-                        // API çağrısı (şu an için devre dışı)
-                        /*
-                        if (vergiNumarasi.isNotBlank() && kullaniciAdi.isNotBlank() && kullaniciSifre.isNotBlank()) {
-                            viewModel.login(
-                                vergiNumarasi = vergiNumarasi,
-                                kullaniciAdi = kullaniciAdi,
-                                kullaniciSifre = kullaniciSifre,
-                                veritabaniAd = veritabaniAd,
-                                donemYil = donemYil,
-                                subeAd = subeAd,
-                                apiKullaniciAdi = apiKullaniciAdi,
-                                apiKullaniciSifre = apiKullaniciSifre
-                            )
-                        }
-                        */
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = true // Artık her zaman aktif
-                ) {
-                    Text("Giriş Yap")
-                }
-            }
-        }
-        
-        // Yardım metni
         Text(
-            text = "Giriş yapmak için Bilsoft hesap bilgilerinizi kullanın",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            text = "Bilsoft Ajanda Modülü",
+            style = MaterialTheme.typography.headlineMedium
         )
         
-        // Development için örnek bilgiler (sadece test amaçlı)
-        if (BuildConfig.DEBUG) {
+        Text(
+            text = "Giriş yaparak hatırlatmalarınızı yönetin",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        
+        OutlinedTextField(
+            value = vergiNumarasi,
+            onValueChange = { vergiNumarasi = it },
+            label = { Text("Vergi Numarası") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true
+        )
+        
+        OutlinedTextField(
+            value = kullaniciAdi,
+            onValueChange = { kullaniciAdi = it },
+            label = { Text("Kullanıcı Adı") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true
+        )
+        
+        OutlinedTextField(
+            value = kullaniciSifre,
+            onValueChange = { kullaniciSifre = it },
+            label = { Text("Kullanıcı Şifre") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true
+        )
+        
+        OutlinedTextField(
+            value = veritabaniAd,
+            onValueChange = { veritabaniAd = it },
+            label = { Text("Veritabanı Adı") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        OutlinedTextField(
+            value = donemYil,
+            onValueChange = { donemYil = it },
+            label = { Text("Dönem Yılı") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true
+        )
+        
+        OutlinedTextField(
+            value = subeAd,
+            onValueChange = { subeAd = it },
+            label = { Text("Şube Adı") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        OutlinedTextField(
+            value = apiKullaniciAdi,
+            onValueChange = { apiKullaniciAdi = it },
+            label = { Text("API Kullanıcı Adı") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        OutlinedTextField(
+            value = apiKullaniciSifre,
+            onValueChange = { apiKullaniciSifre = it },
+            label = { Text("API Kullanıcı Şifre") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            singleLine = true
+        )
+        
+        Button(
+            onClick = {
+                viewModel.login(
+                    vergiNumarasi = vergiNumarasi,
+                    kullaniciAdi = kullaniciAdi,
+                    kullaniciSifre = kullaniciSifre,
+                    veritabaniAd = veritabaniAd,
+                    donemYil = donemYil,
+                    subeAd = subeAd,
+                    apiKullaniciAdi = apiKullaniciAdi,
+                    apiKullaniciSifre = apiKullaniciSifre
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !loginState.isLoading
+        ) {
+            if (loginState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text("Giriş Yap")
+            }
+        }
+        
+        // Test login butonu (development için)
+        OutlinedButton(
+            onClick = { viewModel.testLogin() },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !loginState.isLoading
+        ) {
+            Text("🧪 Test Giriş (API olmadan)")
+        }
+        
+        // Debug bilgileri (sadece development'ta göster)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "🔧 Debug Bilgileri",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "API Endpoint: https://apiv3.bilsoft.com/api/Auth/GirisYap",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                Text(
+                    text = "Vergi No: $vergiNumarasi",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Kullanıcı: $kullaniciAdi",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "API Kullanıcı: $apiKullaniciAdi",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        
+        // Error display with more details
+        loginState.error?.let { errorMsg ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    containerColor = MaterialTheme.colorScheme.errorContainer
                 )
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Test Bilgileri (Sadece Development)",
+                        text = "❌ Giriş Hatası",
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        color = MaterialTheme.colorScheme.onErrorContainer
                     )
                     Text(
-                        text = "Vergi: 0123456010",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        text = errorMsg,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    
+                    // API error code'u göster
+                    loginState.apiCode?.let { code ->
+                        Text(
+                            text = "Hata Kodu: $code",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Success message
+        if (loginState.isSuccess) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "✅ Giriş Başarılı!",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = "E-posta: sskarakussalih77@gmail.com",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        text = "Ana sayfaya yönlendiriliyorsunuz...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
-                    Text(
-                        text = "Şifre: 04a7b4c1",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                    
+                    // Token bilgisi (debug için)
+                    loginState.token?.let { token ->
+                        Text(
+                            text = "Token: ${token.take(20)}...",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
         }

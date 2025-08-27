@@ -21,22 +21,52 @@ data class LoginRequest(
     val apiKullaniciSifre: String
 )
 
+// Gerçek API response formatına göre güncellendi
 data class LoginResponse(
+    @SerializedName("errorDetail")
+    val errorDetail: String? = null,
+    @SerializedName("data")
+    val data: LoginData? = null,
+    @SerializedName("totalCount")
+    val totalCount: Int = 0,
     @SerializedName("success")
-    val success: Boolean,
+    val success: Boolean = false,
     @SerializedName("message")
-    val message: String?,
-    @SerializedName("token")
-    val token: String?,
-    @SerializedName("expiresAt")
-    val expiresAt: String?
+    val message: String? = null,
+    @SerializedName("code")
+    val code: String? = null
 )
 
+data class LoginData(
+    @SerializedName("token")
+    val token: String? = null,
+    @SerializedName("expiresAt")
+    val expiresAt: String? = null,
+    @SerializedName("userInfo")
+    val userInfo: UserInfo? = null
+)
+
+data class UserInfo(
+    @SerializedName("userId")
+    val userId: String? = null,
+    @SerializedName("userName")
+    val userName: String? = null,
+    @SerializedName("email")
+    val email: String? = null
+)
+
+// Generic API response for other endpoints
 data class ApiResponse<T>(
-    @SerializedName("success")
-    val success: Boolean,
-    @SerializedName("message")
-    val message: String?,
+    @SerializedName("errorDetail")
+    val errorDetail: String? = null,
     @SerializedName("data")
-    val data: T?
+    val data: T? = null,
+    @SerializedName("totalCount")
+    val totalCount: Int = 0,
+    @SerializedName("success")
+    val success: Boolean = false,
+    @SerializedName("message")
+    val message: String? = null,
+    @SerializedName("code")
+    val code: String? = null
 )

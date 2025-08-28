@@ -39,7 +39,7 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         if (loginState.isSuccess) {
             try {
-                // Başarı mesajını göstermek için kısa bir gecikme
+                // Başarı mesajını göstermek için kısa bir gecikme oluşturduk
                 delay(1500)
                 navController.navigate("home") {
                     popUpTo("login") { inclusive = true }

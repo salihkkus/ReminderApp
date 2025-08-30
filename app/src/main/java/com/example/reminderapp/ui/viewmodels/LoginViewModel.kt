@@ -24,12 +24,7 @@ class LoginViewModel @Inject constructor(
     fun login(
         vergiNumarasi: String,
         kullaniciAdi: String,
-        kullaniciSifre: String,
-        veritabaniAd: String,
-        donemYil: String,
-        subeAd: String,
-        apiKullaniciAdi: String,
-        apiKullaniciSifre: String
+        kullaniciSifre: String
     ) {
         // Input validation
         if (vergiNumarasi.isBlank() || kullaniciAdi.isBlank() || kullaniciSifre.isBlank()) {
@@ -42,15 +37,16 @@ class LoginViewModel @Inject constructor(
                 Log.d("LoginViewModel", "Login attempt started")
                 _loginState.value = LoginState(isLoading = true, error = null)
                 
+                // API için gerekli olan ek alanları otomatik olarak doldur
                 val loginRequest = LoginRequest(
                     vergiNumarasi = vergiNumarasi.trim(),
                     kullaniciAdi = kullaniciAdi.trim(),
                     kullaniciSifre = kullaniciSifre.trim(),
-                    veritabaniAd = veritabaniAd.trim(),
-                    donemYil = donemYil.trim(),
-                    subeAd = subeAd.trim(),
-                    apiKullaniciAdi = apiKullaniciAdi.trim(),
-                    apiKullaniciSifre = apiKullaniciSifre.trim()
+                    veritabaniAd = vergiNumarasi.trim(), // Vergi numarası ile aynı
+                    donemYil = "2025", // Sabit değer
+                    subeAd = "Merkez", // Sabit değer
+                    apiKullaniciAdi = "BLS-d475b5037621", // Sabit değer
+                    apiKullaniciSifre = "e9d251eb-8d86-4e83-95d5-7163f141f8d3" // Sabit değer
                 )
                 
                 Log.d("LoginViewModel", "Sending login request to API")

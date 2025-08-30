@@ -27,11 +27,6 @@ fun LoginScreen(
     var vergiNumarasi by remember { mutableStateOf("0123456010") }
     var kullaniciAdi by remember { mutableStateOf("sskarakussalih77@gmail.com") }
     var kullaniciSifre by remember { mutableStateOf("04a7b4c1") }
-    var veritabaniAd by remember { mutableStateOf("0123456010") }
-    var donemYil by remember { mutableStateOf("2025") }
-    var subeAd by remember { mutableStateOf("Merkez") }
-    var apiKullaniciAdi by remember { mutableStateOf("BLS-d475b5037621") }
-    var apiKullaniciSifre by remember { mutableStateOf("e9d251eb-8d86-4e83-95d5-7163f141f8d3") }
     
     val loginState by viewModel.loginState.collectAsState()
     
@@ -39,7 +34,7 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         if (loginState.isSuccess) {
             try {
-                // Başarı mesajını göstermek için kısa bir gecikme oluşturduk
+                // Başarı mesajını göstermek için kısa bir gecikme
                 delay(1500)
                 navController.navigate("home") {
                     popUpTo("login") { inclusive = true }
@@ -59,110 +54,97 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Bilsoft Ajanda Modülü",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        
-        Text(
-            text = "Giriş yaparak hatırlatmalarınızı yönetin",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        
-        OutlinedTextField(
-            value = vergiNumarasi,
-            onValueChange = { vergiNumarasi = it },
-            label = { Text("Vergi Numarası") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true
-        )
-        
-        OutlinedTextField(
-            value = kullaniciAdi,
-            onValueChange = { kullaniciAdi = it },
-            label = { Text("Kullanıcı Adı") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
-        )
-        
-        OutlinedTextField(
-            value = kullaniciSifre,
-            onValueChange = { kullaniciSifre = it },
-            label = { Text("Kullanıcı Şifre") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
-        )
-        
-        OutlinedTextField(
-            value = veritabaniAd,
-            onValueChange = { veritabaniAd = it },
-            label = { Text("Veritabanı Adı") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        
-        OutlinedTextField(
-            value = donemYil,
-            onValueChange = { donemYil = it },
-            label = { Text("Dönem Yılı") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true
-        )
-        
-        OutlinedTextField(
-            value = subeAd,
-            onValueChange = { subeAd = it },
-            label = { Text("Şube Adı") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        
-        OutlinedTextField(
-            value = apiKullaniciAdi,
-            onValueChange = { apiKullaniciAdi = it },
-            label = { Text("API Kullanıcı Adı") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        
-        OutlinedTextField(
-            value = apiKullaniciSifre,
-            onValueChange = { apiKullaniciSifre = it },
-            label = { Text("API Kullanıcı Şifre") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            singleLine = true
-        )
-        
-        Button(
-            onClick = {
-                viewModel.login(
-                    vergiNumarasi = vergiNumarasi,
-                    kullaniciAdi = kullaniciAdi,
-                    kullaniciSifre = kullaniciSifre,
-                    veritabaniAd = veritabaniAd,
-                    donemYil = donemYil,
-                    subeAd = subeAd,
-                    apiKullaniciAdi = apiKullaniciAdi,
-                    apiKullaniciSifre = apiKullaniciSifre
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !loginState.isLoading
+        // Logo ve başlık alanı
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(vertical = 32.dp)
         ) {
-            if (loginState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
+            Text(
+                text = "📱",
+                style = MaterialTheme.typography.displayLarge
+            )
+            Text(
+                text = "Bilsoft Ajanda Modülü",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            Text(
+                text = "Giriş yaparak hatırlatmalarınızı yönetin",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+        
+        // Giriş formu
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Giriş Bilgileri",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
                 )
-            } else {
-                Text("Giriş Yap")
+                
+                OutlinedTextField(
+                    value = vergiNumarasi,
+                    onValueChange = { vergiNumarasi = it },
+                    label = { Text("Vergi Numarası") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    supportingText = { Text("Örnek: 0123456010") }
+                )
+                
+                OutlinedTextField(
+                    value = kullaniciAdi,
+                    onValueChange = { kullaniciAdi = it },
+                    label = { Text("Kullanıcı Adı") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    singleLine = true,
+                    supportingText = { Text("E-posta adresiniz") }
+                )
+                
+                OutlinedTextField(
+                    value = kullaniciSifre,
+                    onValueChange = { kullaniciSifre = it },
+                    label = { Text("Şifre") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true,
+                    supportingText = { Text("Şifrenizi girin") }
+                )
+                
+                Button(
+                    onClick = {
+                        viewModel.login(
+                            vergiNumarasi = vergiNumarasi,
+                            kullaniciAdi = kullaniciAdi,
+                            kullaniciSifre = kullaniciSifre
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !loginState.isLoading,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    if (loginState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Giriş Yap", style = MaterialTheme.typography.titleMedium)
+                    }
+                }
             }
         }
         
@@ -203,11 +185,6 @@ fun LoginScreen(
                 )
                 Text(
                     text = "Kullanıcı: $kullaniciAdi",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "API Kullanıcı: $apiKullaniciAdi",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

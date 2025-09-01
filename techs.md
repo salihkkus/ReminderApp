@@ -202,3 +202,22 @@ ________________________________________________________________________________
 - Hızlı prototipleme için uygundur.  
 
 ________________________________________________________________________________________________________________________________________________________________________________________
+
+# Material Design 3 (MD3)
+
+## Nedir?
+- Google’ın en güncel tasarım dili.  
+- **Material You** konsepti ile birlikte geldi.  
+- Kullanıcı cihazından tema renkleri alabilir → **kişiselleştirilmiş tasarım**.  
+
+## Avantajları
+- Modern ve uyumlu görünüm.  
+- Daha yuvarlak köşeler, dinamik renkler.  
+- Android 12+ cihazlarda sistem renklerini otomatik alabilir.  
+- Compose ve XML ile uyumlu.  
+
+## Kullanım Alanı
+- Butonlar, kartlar, input alanları gibi UI bileşenlerini güncel tasarımla oluşturmak.  
+- Kullanıcıya cihazı ile bütünleşmiş bir deneyim sunmak.  
+
+__________________________________________________________________________________________________________________________________________________________________________________________

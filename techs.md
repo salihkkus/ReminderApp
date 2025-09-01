@@ -221,3 +221,34 @@ ________________________________________________________________________________
 - Kullanıcıya cihazı ile bütünleşmiş bir deneyim sunmak.  
 
 __________________________________________________________________________________________________________________________________________________________________________________________
+
+# StateFlow
+
+## Nedir?
+- StateFlow, Kotlin Coroutines kütüphanesinde bulunan, **her zaman bir değer tutan hot Flow** türüdür.  
+- ViewModel → UI arasında güncel durumu (state) paylaşmak için kullanılır.  
+- Yeni kolektörler (observer) her zaman en son değeri hemen alır.  
+
+---
+
+## Temel Özellikler
+- **Hot Flow** → Kolektör olmasa bile değer saklar.  
+- **Her zaman bir başlangıç değeri gerekir.**  
+- **Thread-safe** → `value` veya `update {}` ile güvenli güncelleme yapılır.  
+- **UI ile uyumlu** → Compose’da `collectAsState()`, Activity/Fragment’ta `lifecycleScope` ile kolayca kullanılabilir.  
+
+---
+
+## Avantajlar
+- ViewModel’deki veriyi tek kaynak (**single source of truth**) olarak yönetir.  
+- State değişimlerini otomatik olarak UI’ye yansıtır.  
+- Test edilebilir ve coroutine tabanlı çalışır.  
+
+---
+
+## Kullanım Senaryosu
+- **UI state yönetimi** (örneğin: yükleniyor, hata, veri listesi).  
+- MVVM + Compose projelerinde ViewModel’den gelen veriyi UI’ye aktarmak.  
+- Cold Flow’ları `stateIn` ile StateFlow’a çevirerek en son değeri saklamak.  
+
+__________________________________________________________________________________________________________________________________________________________________________________________

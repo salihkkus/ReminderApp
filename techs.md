@@ -167,3 +167,38 @@ Normalde ağ (network) işlemleri karmaşıktır, Retrofit bu süreci basitleşt
 - Hata yönetimini kolaylaştırır.
  
 __________________________________________________________________________________________________________________________________________________________________________________________
+
+# Jetpack Compose
+
+## Nedir?
+- Jetpack Compose, Android’in modern **UI toolkit**’idir.  
+- XML yazmadan, tamamen **Kotlin kodu** ile arayüz oluşturmayı sağlar.  
+- Deklaratif bir yaklaşım kullanır: *"Ne görmek istiyorum?"* diye tanımlarsın, Compose gerisini halleder.  
+- Daha az kod → Daha okunabilir ve bakımı kolay.
+
+---
+
+## Temel Özellikler
+- **Deklaratif Yapı** → UI güncellemelerini otomatik yapar. State değişirse ekran kendini yeniler.  
+- **Daha Az Kod** → XML ve Adapter karmaşasına gerek kalmaz.  
+- **Kotlin ile Güçlü Entegrasyon** → Coroutine, Flow gibi modern Kotlin özellikleriyle uyumlu.  
+- **Material Design Desteği** → Buton, Card, TextField gibi hazır UI bileşenleri içerir.  
+- **Hızlı Önizleme (Preview)** → Android Studio’da anında tasarımı görebilirsin.  
+
+---
+
+## Avantajlar
+- XML + Adapter yerine tek noktadan, sade bir şekilde UI geliştirme.  
+- State yönetimi kolaydır (örneğin `mutableStateOf` ile).  
+- Daha az boilerplate kod → daha hızlı geliştirme.  
+- Test edilebilirliği artırır.  
+- Google, gelecekte Android UI geliştirme için Compose’u merkez yapıyor → uzun vadeli yatırım.  
+
+---
+
+## Kullanım Senaryosu
+- Yeni Android projelerinde **varsayılan UI çözümü** olarak kullanılır.  
+- MVVM + Compose çok iyi çalışır → ViewModel’deki veriyi direkt UI’ye yansıtabilirsin.  
+- Hızlı prototipleme için uygundur.  
+
+________________________________________________________________________________________________________________________________________________________________________________________

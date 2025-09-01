@@ -139,3 +139,31 @@ Google tarafından geliştirilmiş olup Dagger üzerine inşa edilmiştir.
 - MVVM ve REST API yapısıyla uyumlu çalışır.  
 
 _________________________________________________________________________________________________________________________________________________________________________________________
+
+# Retrofit
+
+## Nedir?
+Retrofit, **Android** için geliştirilmiş bir HTTP istemci kütüphanesidir.  
+REST API’lerle haberleşmeyi kolaylaştırır.  
+Normalde ağ (network) işlemleri karmaşıktır, Retrofit bu süreci basitleştirir.
+
+## Ne İşe Yarar?
+- API isteklerini kolayca yapmanı sağlar.  
+- JSON verilerini otomatik olarak Java/Kotlin objelerine dönüştürür.  
+- Ağ işlemlerinde hata yönetimi ve asenkron (eşzamansız) çalışma desteği sunar.  
+- Okunabilir ve sürdürülebilir kod yazmayı sağlar.
+
+## Özellikleri
+- **Kolay kullanım** → Basit arayüzler üzerinden API istekleri yapılır.  
+- **JSON Parsing** → `Gson`, `Moshi` gibi kütüphanelerle JSON verileri otomatik parse edilir.  
+- **Asenkron Çalışma** → Callback veya Coroutines ile çalışır.  
+- **Dinamik URL desteği** → URL parametreleri, header bilgileri kolayca eklenebilir.  
+- **RxJava & Coroutines desteği** → Modern asenkron programlamayla uyumludur.
+
+## Avantajları
+- Kod tekrarını azaltır.  
+- Ağ işlemlerini düzenli ve okunabilir hale getirir.  
+- Test edilebilirliği artırır.  
+- Hata yönetimini kolaylaştırır.
+ 
+__________________________________________________________________________________________________________________________________________________________________________________________

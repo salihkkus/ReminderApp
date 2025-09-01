@@ -106,3 +106,36 @@ Amaç, uygulamanın farklı katmanlarını birbirinden ayırarak **daha düzenli
 - **MVC**: Controller, hem iş mantığı hem de UI ile ilgilenir → zamanla karmaşık hale gelir.  
 - **MVVM**: View sadece arayüzle ilgilenir, ViewModel iş mantığını üstlenir → daha düzenli ve sürdürülebilir yapı sağlar.  
 
+________________________________________________________________________________________________________________________________________________________________________________________
+
+
+# Hilt
+
+## Nedir?
+Hilt, Android’de **Dependency Injection (Bağımlılık Enjeksiyonu)** işlemini kolaylaştıran bir kütüphanedir.  
+Google tarafından geliştirilmiş olup Dagger üzerine inşa edilmiştir.  
+
+## Ne İşe Yarar?
+- Nesnelerin (örneğin `Repository`, `Retrofit`, `Room`) yönetimini otomatik yapar.  
+- Kod tekrarını azaltır, modülerlik sağlar.  
+- Test yazmayı kolaylaştırır.  
+- Büyük projelerde bağımlılıkların yönetimini basitleştirir.  
+
+## Temel Özellikleri
+- **@Inject** → Bir sınıfın bağımlılıklarını Hilt’in sağlamasını sağlar.  
+- **@Module & @Provides** → Hilt’e hangi nesneyi nasıl oluşturacağını söyler.  
+- **@Singleton** → Nesnenin tek bir örneğini (instance) oluşturur.  
+- **@HiltViewModel** → ViewModel bağımlılıklarını otomatik olarak enjekte eder.  
+- **@AndroidEntryPoint** → Hilt’in dependency injection yapacağı sınıfları işaretler (Activity, Fragment).  
+
+## MVVM ve REST API ile İlişkisi
+- **MVVM**: ViewModel içinde Repository veya UseCase bağımlılıklarını Hilt otomatik olarak sağlar.  
+- **REST API**: Retrofit, OkHttp gibi ağ nesneleri Hilt modüllerinde tanımlanır ve kolayca enjekte edilir.  
+
+## Avantajları
+- Kod tekrarını azaltır.  
+- Daha temiz ve okunabilir mimari sağlar.  
+- Test edilebilirliği artırır (Mock nesneler kolay eklenir).  
+- MVVM ve REST API yapısıyla uyumlu çalışır.  
+
+_________________________________________________________________________________________________________________________________________________________________________________________

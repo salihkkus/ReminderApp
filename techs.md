@@ -289,3 +289,28 @@ ________________________________________________________________________________
 
 ___________________________________________________________________________________________________________________________________________________________________________________________
 
+# OkHttp
+
+## Nedir?
+- **OkHttp**, Android ve Java için popüler bir **HTTP istemcisidir**.  
+- Ağ işlemlerini (GET, POST, PUT, DELETE gibi) hızlı ve güvenli bir şekilde yapmayı sağlar.  
+- **Retrofit**, arka planda HTTP isteklerini yönetmek için genellikle OkHttp kullanır.  
+
+## Avantajları
+- Hafif ve hızlıdır.  
+- **Cache** (önbellek) desteği ile internet yokken de veri sağlayabilir.  
+- **Interceptor** desteği sayesinde:  
+  - Loglama yapabilir,  
+  - Header ekleyebilir,  
+  - Token yenileme işlemleri gibi özel durumları yönetebilir.  
+- Timeout (zaman aşımı) ayarlarını kolayca yapmayı sağlar.  
+
+## Nerelerde Kullanılır?
+- **Doğrudan HTTP istekleri atmak** için.  
+- **Retrofit ile birlikte** API işlemlerinde.  
+- Ağ trafiğini **loglamak veya özelleştirmek** için.  
+
+## Kısaca
+OkHttp, Android uygulamalarında internet üzerinden veri alışverişini kolaylaştıran, hızlı, güvenli ve esnek bir kütüphanedir. Retrofit gibi popüler kütüphanelerin temelinde de OkHttp vardır.
+
+___________________________________________________________________________________________________________________________________________________________________________________________

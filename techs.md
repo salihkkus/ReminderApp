@@ -1,50 +1,8 @@
 # ReminderApp
 Proje boyunca öğrendiğim ve kullanmaya çalıştığım teknolojiler, mimariler, kütüphaneler vs.
 
-___________________________________________________________________________________________________________________________________________________________________________________________
 
-# REST API
-
-## Nedir?
-REST (Representational State Transfer) API, istemci (client) ile sunucu (server) arasındaki iletişimi sağlayan bir web servisidir. HTTP protokolünü kullanır. Modern yazılım geliştirmede en yaygın kullanılan servis iletişim yöntemlerinden biridir.  
-
-## Ne İşe Yarar?
-- Farklı uygulamalar arasında veri alışverişini sağlar.  
-- Örneğin: Mobil uygulama → Sunucudan kullanıcı bilgilerini almak için REST API kullanır.  
-- Platform bağımsızdır: Android, iOS, web uygulamaları aynı API üzerinden iletişim kurabilir.  
-
-## Temel Özellikleri
-- **HTTP metodları** ile çalışır:  
-  - `GET` → Veri getirir  (Read)
-  - `POST` → Yeni veri ekler  (Create)
-  - `PUT` → Var olan veriyi günceller  (Update)
-  - `DELETE` → Veriyi siler  (Delete)
-
-- **JSON** en yaygın kullanılan veri formatıdır (XML, plain text de olabilir).  
-
-- **Stateless (durumsuz)**: Her istek bağımsızdır, sunucu istemcinin önceki isteklerini hatırlamaz.  
-
-- **Endpoint mantığı**:  
-  - `/users` → Tüm kullanıcıları getirir  
-  - `/users/5` → ID’si 5 olan kullanıcıyı getirir  
-
-## HTTP Status Kodları
-REST API, her isteğe bir **HTTP status code** ile yanıt verir. Bu kodlar isteğin sonucunu belirtir:  
-
-- **200 OK** → İstek başarılı  
-- **201 Created** → Yeni kaynak oluşturuldu  
-- **204 No Content** → İşlem başarılı, fakat içerik yok  
-- **400 Bad Request** → Hatalı istek  
-- **401 Unauthorized** → Yetkisiz erişim  
-- **403 Forbidden** → Yetki yok  
-- **404 Not Found** → Kaynak bulunamadı  
-- **500 Internal Server Error** → Sunucu hatası  
-
-## Avantajları
-- Basit ve anlaşılırdır.  
-- Hafiftir ve hızlıdır.  
-- Yaygın desteklenir, öğrenmesi ve kullanması kolaydır.  
-- Platformdan bağımsızdır, her dil ve ortamda kullanılabilir.  
+## MİMARİ VE DURUM YÖNETİMİ
 
 ________________________________________________________________________________________________________________________________________________________________________________________
 
@@ -138,7 +96,126 @@ Google tarafından geliştirilmiş olup Dagger üzerine inşa edilmiştir.
 - Test edilebilirliği artırır (Mock nesneler kolay eklenir).  
 - MVVM ve REST API yapısıyla uyumlu çalışır.  
 
+
+___________________________________________________________________________________________________________________________________________________________________________________________
+
+# Coroutines
+
+## Nedir?
+- **Coroutines**, Kotlin'de **asenkron** (aynı anda birden fazla iş) ve **eşzamanlı** programlamayı kolaylaştıran yapıdır.  
+- Normalde asenkron işlemler (ör. ağ istekleri, veritabanı işlemleri) çok karmaşık olabilir, ancak Coroutines bunları **basit fonksiyonlar gibi** yazmamızı sağlar.  
+- Hafiftir: Binlerce coroutine aynı anda çalışabilir, sistemin performansını zorlamaz.
+
+---
+
+## Neden Kullanılır?
+- **Arka planda işlem yapma**: Ağ çağrıları, veritabanı sorguları gibi zaman alan işler ana thread’i (UI) bloke etmeden çalışır.  
+- **Kolay okunur kod**: Callback cehennemi yerine düz, sıralı kod gibi görünür.  
+- **Hafiflik**: Thread’lerden çok daha az kaynak tüketir.  
+
+---
+
+## Temel Kavramlar
+- **Suspend Fonksiyon**: Bekleme yapabilen fonksiyon. Örn: `suspend fun getData()`.  
+- **Scope (CoroutineScope)**: Coroutine’lerin hangi yaşam döngüsünde çalışacağını belirler.  
+  - `GlobalScope` → Uygulama süresince yaşar.  
+  - `viewModelScope` → ViewModel ile yaşar.  
+  - `lifecycleScope` → Activity/Fragment ile yaşar.  
+- **Dispatcher**: Coroutine’in hangi thread’de çalışacağını belirler.  
+  - `Dispatchers.Main` → UI işlemleri  
+  - `Dispatchers.IO` → Ağ / Veritabanı işlemleri  
+  - `Dispatchers.Default` → Yoğun CPU işlemleri  
+
+---
+
+## Özet
+- Coroutines, Kotlin’in **modern asenkron çözümüdür**.  
+- **Okunabilir**, **hafif** ve **verimli** kod yazmayı sağlar.  
+- UI’yi dondurmadan arka planda işlem yapmaya imkan tanır.  
+
+___________________________________________________________________________________________________________________________________________________________________________________________
+
+
+# StateFlow
+
+## Nedir?
+- StateFlow, Kotlin Coroutines kütüphanesinde bulunan, **her zaman bir değer tutan hot Flow** türüdür.  
+- ViewModel → UI arasında güncel durumu (state) paylaşmak için kullanılır.  
+- Yeni kolektörler (observer) her zaman en son değeri hemen alır.  
+
+---
+
+## Temel Özellikler
+- **Hot Flow** → Kolektör olmasa bile değer saklar.  
+- **Her zaman bir başlangıç değeri gerekir.**  
+- **Thread-safe** → `value` veya `update {}` ile güvenli güncelleme yapılır.  
+- **UI ile uyumlu** → Compose’da `collectAsState()`, Activity/Fragment’ta `lifecycleScope` ile kolayca kullanılabilir.  
+
+---
+
+## Avantajlar
+- ViewModel’deki veriyi tek kaynak (**single source of truth**) olarak yönetir.  
+- State değişimlerini otomatik olarak UI’ye yansıtır.  
+- Test edilebilir ve coroutine tabanlı çalışır.  
+
+---
+
+## Kullanım Senaryosu
+- **UI state yönetimi** (örneğin: yükleniyor, hata, veri listesi).  
+- MVVM + Compose projelerinde ViewModel’den gelen veriyi UI’ye aktarmak.  
+- Cold Flow’ları `stateIn` ile StateFlow’a çevirerek en son değeri saklamak.  
+
+__________________________________________________________________________________________________________________________________________________________________________________________
+
+
+## NETWORK VE API TEKNOLOJİLERİ
+
+
+# REST API
+
+## Nedir?
+REST (Representational State Transfer) API, istemci (client) ile sunucu (server) arasındaki iletişimi sağlayan bir web servisidir. HTTP protokolünü kullanır. Modern yazılım geliştirmede en yaygın kullanılan servis iletişim yöntemlerinden biridir.  
+
+## Ne İşe Yarar?
+- Farklı uygulamalar arasında veri alışverişini sağlar.  
+- Örneğin: Mobil uygulama → Sunucudan kullanıcı bilgilerini almak için REST API kullanır.  
+- Platform bağımsızdır: Android, iOS, web uygulamaları aynı API üzerinden iletişim kurabilir.  
+
+## Temel Özellikleri
+- **HTTP metodları** ile çalışır:  
+  - `GET` → Veri getirir  (Read)
+  - `POST` → Yeni veri ekler  (Create)
+  - `PUT` → Var olan veriyi günceller  (Update)
+  - `DELETE` → Veriyi siler  (Delete)
+
+- **JSON** en yaygın kullanılan veri formatıdır (XML, plain text de olabilir).  
+
+- **Stateless (durumsuz)**: Her istek bağımsızdır, sunucu istemcinin önceki isteklerini hatırlamaz.  
+
+- **Endpoint mantığı**:  
+  - `/users` → Tüm kullanıcıları getirir  
+  - `/users/5` → ID’si 5 olan kullanıcıyı getirir  
+
+## HTTP Status Kodları
+REST API, her isteğe bir **HTTP status code** ile yanıt verir. Bu kodlar isteğin sonucunu belirtir:  
+
+- **200 OK** → İstek başarılı  
+- **201 Created** → Yeni kaynak oluşturuldu  
+- **204 No Content** → İşlem başarılı, fakat içerik yok  
+- **400 Bad Request** → Hatalı istek  
+- **401 Unauthorized** → Yetkisiz erişim  
+- **403 Forbidden** → Yetki yok  
+- **404 Not Found** → Kaynak bulunamadı  
+- **500 Internal Server Error** → Sunucu hatası  
+
+## Avantajları
+- Basit ve anlaşılırdır.  
+- Hafiftir ve hızlıdır.  
+- Yaygın desteklenir, öğrenmesi ve kullanması kolaydır.  
+- Platformdan bağımsızdır, her dil ve ortamda kullanılabilir.  
 _________________________________________________________________________________________________________________________________________________________________________________________
+
+
 
 # Retrofit
 
@@ -167,6 +244,34 @@ Normalde ağ (network) işlemleri karmaşıktır, Retrofit bu süreci basitleşt
 - Hata yönetimini kolaylaştırır.
  
 __________________________________________________________________________________________________________________________________________________________________________________________
+
+# OkHttp
+
+## Nedir?
+- **OkHttp**, Android ve Java için popüler bir **HTTP istemcisidir**.  
+- Ağ işlemlerini (GET, POST, PUT, DELETE gibi) hızlı ve güvenli bir şekilde yapmayı sağlar.  
+- **Retrofit**, arka planda HTTP isteklerini yönetmek için genellikle OkHttp kullanır.  
+
+## Avantajları
+- Hafif ve hızlıdır.  
+- **Cache** (önbellek) desteği ile internet yokken de veri sağlayabilir.  
+- **Interceptor** desteği sayesinde:  
+  - Loglama yapabilir,  
+  - Header ekleyebilir,  
+  - Token yenileme işlemleri gibi özel durumları yönetebilir.  
+- Timeout (zaman aşımı) ayarlarını kolayca yapmayı sağlar.  
+
+## Nerelerde Kullanılır?
+- **Doğrudan HTTP istekleri atmak** için.  
+- **Retrofit ile birlikte** API işlemlerinde.  
+- Ağ trafiğini **loglamak veya özelleştirmek** için.  
+
+## Kısaca
+OkHttp, Android uygulamalarında internet üzerinden veri alışverişini kolaylaştıran, hızlı, güvenli ve esnek bir kütüphanedir. Retrofit gibi popüler kütüphanelerin temelinde de OkHttp vardır.
+
+___________________________________________________________________________________________________________________________________________________________________________________________
+
+## UI FRAMEWORK VE TEKNOLOJİLER
 
 # Jetpack Compose
 
@@ -221,99 +326,6 @@ ________________________________________________________________________________
 - Kullanıcıya cihazı ile bütünleşmiş bir deneyim sunmak.  
 
 __________________________________________________________________________________________________________________________________________________________________________________________
-
-# StateFlow
-
-## Nedir?
-- StateFlow, Kotlin Coroutines kütüphanesinde bulunan, **her zaman bir değer tutan hot Flow** türüdür.  
-- ViewModel → UI arasında güncel durumu (state) paylaşmak için kullanılır.  
-- Yeni kolektörler (observer) her zaman en son değeri hemen alır.  
-
----
-
-## Temel Özellikler
-- **Hot Flow** → Kolektör olmasa bile değer saklar.  
-- **Her zaman bir başlangıç değeri gerekir.**  
-- **Thread-safe** → `value` veya `update {}` ile güvenli güncelleme yapılır.  
-- **UI ile uyumlu** → Compose’da `collectAsState()`, Activity/Fragment’ta `lifecycleScope` ile kolayca kullanılabilir.  
-
----
-
-## Avantajlar
-- ViewModel’deki veriyi tek kaynak (**single source of truth**) olarak yönetir.  
-- State değişimlerini otomatik olarak UI’ye yansıtır.  
-- Test edilebilir ve coroutine tabanlı çalışır.  
-
----
-
-## Kullanım Senaryosu
-- **UI state yönetimi** (örneğin: yükleniyor, hata, veri listesi).  
-- MVVM + Compose projelerinde ViewModel’den gelen veriyi UI’ye aktarmak.  
-- Cold Flow’ları `stateIn` ile StateFlow’a çevirerek en son değeri saklamak.  
-
-__________________________________________________________________________________________________________________________________________________________________________________________
-
-# Coroutines
-
-## Nedir?
-- **Coroutines**, Kotlin'de **asenkron** (aynı anda birden fazla iş) ve **eşzamanlı** programlamayı kolaylaştıran yapıdır.  
-- Normalde asenkron işlemler (ör. ağ istekleri, veritabanı işlemleri) çok karmaşık olabilir, ancak Coroutines bunları **basit fonksiyonlar gibi** yazmamızı sağlar.  
-- Hafiftir: Binlerce coroutine aynı anda çalışabilir, sistemin performansını zorlamaz.
-
----
-
-## Neden Kullanılır?
-- **Arka planda işlem yapma**: Ağ çağrıları, veritabanı sorguları gibi zaman alan işler ana thread’i (UI) bloke etmeden çalışır.  
-- **Kolay okunur kod**: Callback cehennemi yerine düz, sıralı kod gibi görünür.  
-- **Hafiflik**: Thread’lerden çok daha az kaynak tüketir.  
-
----
-
-## Temel Kavramlar
-- **Suspend Fonksiyon**: Bekleme yapabilen fonksiyon. Örn: `suspend fun getData()`.  
-- **Scope (CoroutineScope)**: Coroutine’lerin hangi yaşam döngüsünde çalışacağını belirler.  
-  - `GlobalScope` → Uygulama süresince yaşar.  
-  - `viewModelScope` → ViewModel ile yaşar.  
-  - `lifecycleScope` → Activity/Fragment ile yaşar.  
-- **Dispatcher**: Coroutine’in hangi thread’de çalışacağını belirler.  
-  - `Dispatchers.Main` → UI işlemleri  
-  - `Dispatchers.IO` → Ağ / Veritabanı işlemleri  
-  - `Dispatchers.Default` → Yoğun CPU işlemleri  
-
----
-
-## Özet
-- Coroutines, Kotlin’in **modern asenkron çözümüdür**.  
-- **Okunabilir**, **hafif** ve **verimli** kod yazmayı sağlar.  
-- UI’yi dondurmadan arka planda işlem yapmaya imkan tanır.  
-
-___________________________________________________________________________________________________________________________________________________________________________________________
-
-# OkHttp
-
-## Nedir?
-- **OkHttp**, Android ve Java için popüler bir **HTTP istemcisidir**.  
-- Ağ işlemlerini (GET, POST, PUT, DELETE gibi) hızlı ve güvenli bir şekilde yapmayı sağlar.  
-- **Retrofit**, arka planda HTTP isteklerini yönetmek için genellikle OkHttp kullanır.  
-
-## Avantajları
-- Hafif ve hızlıdır.  
-- **Cache** (önbellek) desteği ile internet yokken de veri sağlayabilir.  
-- **Interceptor** desteği sayesinde:  
-  - Loglama yapabilir,  
-  - Header ekleyebilir,  
-  - Token yenileme işlemleri gibi özel durumları yönetebilir.  
-- Timeout (zaman aşımı) ayarlarını kolayca yapmayı sağlar.  
-
-## Nerelerde Kullanılır?
-- **Doğrudan HTTP istekleri atmak** için.  
-- **Retrofit ile birlikte** API işlemlerinde.  
-- Ağ trafiğini **loglamak veya özelleştirmek** için.  
-
-## Kısaca
-OkHttp, Android uygulamalarında internet üzerinden veri alışverişini kolaylaştıran, hızlı, güvenli ve esnek bir kütüphanedir. Retrofit gibi popüler kütüphanelerin temelinde de OkHttp vardır.
-
-___________________________________________________________________________________________________________________________________________________________________________________________
 
 # Navigation Compose
 

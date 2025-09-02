@@ -252,3 +252,40 @@ ________________________________________________________________________________
 - Cold Flow’ları `stateIn` ile StateFlow’a çevirerek en son değeri saklamak.  
 
 __________________________________________________________________________________________________________________________________________________________________________________________
+
+# Coroutines
+
+## Nedir?
+- **Coroutines**, Kotlin'de **asenkron** (aynı anda birden fazla iş) ve **eşzamanlı** programlamayı kolaylaştıran yapıdır.  
+- Normalde asenkron işlemler (ör. ağ istekleri, veritabanı işlemleri) çok karmaşık olabilir, ancak Coroutines bunları **basit fonksiyonlar gibi** yazmamızı sağlar.  
+- Hafiftir: Binlerce coroutine aynı anda çalışabilir, sistemin performansını zorlamaz.
+
+---
+
+## Neden Kullanılır?
+- **Arka planda işlem yapma**: Ağ çağrıları, veritabanı sorguları gibi zaman alan işler ana thread’i (UI) bloke etmeden çalışır.  
+- **Kolay okunur kod**: Callback cehennemi yerine düz, sıralı kod gibi görünür.  
+- **Hafiflik**: Thread’lerden çok daha az kaynak tüketir.  
+
+---
+
+## Temel Kavramlar
+- **Suspend Fonksiyon**: Bekleme yapabilen fonksiyon. Örn: `suspend fun getData()`.  
+- **Scope (CoroutineScope)**: Coroutine’lerin hangi yaşam döngüsünde çalışacağını belirler.  
+  - `GlobalScope` → Uygulama süresince yaşar.  
+  - `viewModelScope` → ViewModel ile yaşar.  
+  - `lifecycleScope` → Activity/Fragment ile yaşar.  
+- **Dispatcher**: Coroutine’in hangi thread’de çalışacağını belirler.  
+  - `Dispatchers.Main` → UI işlemleri  
+  - `Dispatchers.IO` → Ağ / Veritabanı işlemleri  
+  - `Dispatchers.Default` → Yoğun CPU işlemleri  
+
+---
+
+## Özet
+- Coroutines, Kotlin’in **modern asenkron çözümüdür**.  
+- **Okunabilir**, **hafif** ve **verimli** kod yazmayı sağlar.  
+- UI’yi dondurmadan arka planda işlem yapmaya imkan tanır.  
+
+___________________________________________________________________________________________________________________________________________________________________________________________
+

@@ -314,3 +314,27 @@ ________________________________________________________________________________
 OkHttp, Android uygulamalarında internet üzerinden veri alışverişini kolaylaştıran, hızlı, güvenli ve esnek bir kütüphanedir. Retrofit gibi popüler kütüphanelerin temelinde de OkHttp vardır.
 
 ___________________________________________________________________________________________________________________________________________________________________________________________
+
+# Navigation Compose
+
+## Nedir?
+- **Navigation Compose**, Jetpack Compose ile birlikte kullanılan **navigasyon kütüphanesidir**.  
+- Uygulama içinde **farklı ekranlar (screen)** arasında geçiş yapmayı sağlar.  
+- Eski `Fragment` tabanlı yapıya gerek kalmadan, tamamen Compose uyumlu çalışır.  
+
+## Avantajları
+- **Deklaratif** yapıya uygun, Compose ile sorunsuz çalışır.  
+- Kod okunabilirliği yüksektir.  
+- Parametre gönderme ve alma işlemleri kolaydır.  
+- **Back stack** (geri dönüş yığını) otomatik yönetilir.  
+- Deep link desteği vardır.  
+
+## Nerelerde Kullanılır?
+- Çok ekranlı Compose uygulamalarında.  
+- Kullanıcı akışlarını (ör. giriş → ana sayfa → profil) yönetmek için.  
+- Alt menü (BottomNavigation) ve üst seviye navigasyonlarda.  
+
+## Kısaca
+Navigation Compose, Compose tabanlı uygulamalarda **ekran geçişlerini kolaylaştıran, modern ve sade** bir navigasyon çözümüdür.
+
+__________________________________________________________________________________________________________________________________________________________________________________________

@@ -6,16 +6,18 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import android.content.Context
 import com.example.reminderapp.data.model.Reminder
+import com.example.reminderapp.data.model.Notification
 
 @Database(
-    entities = [Reminder::class],
-    version = 1,
+    entities = [Reminder::class, Notification::class],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     
     abstract fun reminderDao(): ReminderDao
+    abstract fun notificationDao(): NotificationDao
     
     companion object {
         @Volatile

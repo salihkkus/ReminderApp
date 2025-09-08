@@ -3,6 +3,7 @@ package com.example.reminderapp.di
 import android.content.Context
 import com.example.reminderapp.data.local.AppDatabase
 import com.example.reminderapp.data.local.ReminderDao
+import com.example.reminderapp.data.local.NotificationDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,5 +25,11 @@ object DatabaseModule {
     @Singleton
     fun provideReminderDao(database: AppDatabase): ReminderDao {
         return database.reminderDao()
+    }
+    
+    @Provides
+    @Singleton
+    fun provideNotificationDao(database: AppDatabase): NotificationDao {
+        return database.notificationDao()
     }
 }

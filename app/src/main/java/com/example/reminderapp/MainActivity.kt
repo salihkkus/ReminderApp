@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reminderapp.ui.screens.HomeScreen
 import com.example.reminderapp.ui.screens.LoginScreen
+import com.example.reminderapp.ui.screens.AddNotificationScreen
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -46,6 +47,9 @@ fun ReminderApp() {
             }
             composable("home") {
                 HomeScreen(navController = navController)
+            }
+            composable("add_notification") {
+                AddNotificationScreen(navController = navController)
             }
         }
     }

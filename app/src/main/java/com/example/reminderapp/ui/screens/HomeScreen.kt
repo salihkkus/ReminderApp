@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,17 +20,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reminderapp.data.model.Priority
 import com.example.reminderapp.data.model.Reminder
 import com.example.reminderapp.ui.components.ReminderItem
+import com.example.reminderapp.ui.components.NotificationItem
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import com.example.reminderapp.ui.viewmodels.HomeViewModel
+import com.example.reminderapp.ui.viewmodels.NotificationViewModel
 import org.threeten.bp.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
-    val reminders by viewModel.reminders.collectAsState()
+    val reminders by homeViewModel.reminders.collectAsState()
+    val notifications by notificationViewModel.notifications.collectAsState()
     
     // Başarı mesajı için state
     var showSuccessMessage by remember { mutableStateOf(true) }
@@ -104,8 +109,21 @@ fun HomeScreen(
                 }
             }
             
+            // Yeni Bildirim Butonu
+            Button(
+                onClick = { navController.navigate("add_notification") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Text("Yeni Bildirim", style = MaterialTheme.typography.titleMedium)
+            }
+            
             // Ana içerik
-            if (reminders.isEmpty()) {
+            if (reminders.isEmpty() && notifications.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -117,11 +135,11 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Henüz hatırlatma yok",
+                            text = "Henüz içerik yok",
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Text(
-                            text = "Yeni hatırlatma eklemek için + butonuna tıklayın",
+                            text = "Yeni bildirim veya hatırlatma eklemek için + butonlarına tıklayın",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -135,13 +153,49 @@ fun HomeScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(reminders) { reminder ->
-                        ReminderItem(
-                            reminder = reminder,
-                            onToggleComplete = { viewModel.toggleReminderComplete(reminder.id) },
-                            onDelete = { viewModel.deleteReminder(reminder) },
-                            onEdit = { /* TODO: Navigate to edit reminder */ }
-                        )
+                    // Bildirimler bölümü
+                    if (notifications.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "📢 Bildirimler",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        
+                        items(notifications) { notification ->
+                            NotificationItem(
+                                notification = notification,
+                                onDelete = { notificationViewModel.deleteNotification(notification) },
+                                onEdit = { /* TODO: Navigate to edit notification */ }
+                            )
+                        }
+                        
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+                    
+                    // Hatırlatmalar bölümü
+                    if (reminders.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "📅 Hatırlatmalar",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        
+                        items(reminders) { reminder ->
+                            ReminderItem(
+                                reminder = reminder,
+                                onToggleComplete = { homeViewModel.toggleReminderComplete(reminder.id) },
+                                onDelete = { homeViewModel.deleteReminder(reminder) },
+                                onEdit = { /* TODO: Navigate to edit reminder */ }
+                            )
+                        }
                     }
                 }
             }

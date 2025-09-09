@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.reminderapp.data.model.Priority
 import com.example.reminderapp.data.model.Reminder
+import com.example.reminderapp.data.model.ApiNotificationRequest
 import com.example.reminderapp.ui.components.ReminderItem
 import com.example.reminderapp.ui.components.NotificationItem
 import com.example.reminderapp.ui.theme.ReminderappTheme

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.reminderapp.data.api.BilsoftApiService
 import com.example.reminderapp.data.model.LoginRequest
 import com.example.reminderapp.data.model.UserInfo
+import com.example.reminderapp.data.local.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val apiService: BilsoftApiService
+    private val apiService: BilsoftApiService,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
     
     private val _loginState = MutableStateFlow(LoginState())
@@ -56,6 +58,14 @@ class LoginViewModel @Inject constructor(
                 
                 if (response.success == true && response.data?.token != null) {
                     Log.d("LoginViewModel", "Login successful, token received")
+                    
+                    // Token'ı SharedPreferences'a kaydet
+                    tokenManager.saveToken(response.data.token)
+                    tokenManager.saveUserInfo(
+                        userId = response.data.userInfo?.userId,
+                        userName = response.data.userInfo?.userName
+                    )
+                    
                     _loginState.value = LoginState(
                         isSuccess = true,
                         token = response.data.token,

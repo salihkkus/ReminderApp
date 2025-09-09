@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.reminderapp.data.local.TokenManager
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
 import org.threeten.bp.LocalDateTime
@@ -38,6 +39,10 @@ fun AddNotificationScreen(
     
     // Success state
     var showSuccessMessage by remember { mutableStateOf(false) }
+    var showErrorMessage by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    
+    // Token artık NotificationViewModel içinde TokenManager ile alınıyor
     
     Scaffold(
         topBar = {
@@ -169,36 +174,37 @@ fun AddNotificationScreen(
                 }
             }
             
-            // Kaydet butonu
-            Button(
-                onClick = {
-                    // Validation
-                    if (firma.isBlank() || adSoyad.isBlank() || telefon.isBlank() || 
-                        gsm.isBlank() || aciklama.isBlank() || kullanici.isBlank()) {
-                        // TODO: Show error message
-                        return@Button
-                    }
-                    
-                    // Add notification
-                    viewModel.addNotification(
-                        firma = firma,
-                        adSoyad = adSoyad,
-                        telefon = telefon,
-                        gsm = gsm,
-                        aciklama = aciklama,
-                        tarihSaat = tarihSaat,
-                        kullanici = kullanici
+                // Kaydet butonu
+                Button(
+                    onClick = {
+                        // Validation
+                        if (firma.isBlank() || adSoyad.isBlank() || telefon.isBlank() || 
+                            gsm.isBlank() || aciklama.isBlank() || kullanici.isBlank()) {
+                            showErrorMessage = true
+                            errorMessage = "Lütfen tüm alanları doldurun"
+                            return@Button
+                        }
+                        
+                        // Add notification via API (token otomatik alınıyor)
+                        viewModel.addNotification(
+                            firma = firma,
+                            adSoyad = adSoyad,
+                            telefon = telefon,
+                            gsm = gsm,
+                            aciklama = aciklama,
+                            tarihSaat = tarihSaat,
+                            kullanici = kullanici
+                        )
+                        
+                        showSuccessMessage = true
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
-                    
-                    showSuccessMessage = true
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text("Kaydet", style = MaterialTheme.typography.titleMedium)
-            }
+                ) {
+                    Text("Kaydet", style = MaterialTheme.typography.titleMedium)
+                }
             
             // Başarı mesajı
             if (showSuccessMessage) {
@@ -220,6 +226,32 @@ fun AddNotificationScreen(
                             text = "Ana sayfaya dönmek için geri butonuna basın",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+            }
+            
+            // Hata mesajı
+            if (showErrorMessage) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "❌ Hata!",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Text(
+                            text = errorMessage,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }

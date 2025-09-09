@@ -3,8 +3,9 @@ package com.example.reminderapp.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reminderapp.data.model.Notification
+import com.example.reminderapp.data.model.ApiNotificationRequest
 import com.example.reminderapp.data.repository.NotificationRepository
+import com.example.reminderapp.data.local.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,10 +17,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
-    private val repository: NotificationRepository
+    private val repository: NotificationRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
     
-    val notifications: StateFlow<List<Notification>> = repository
+    val notifications: StateFlow<List<ApiNotificationRequest>> = repository
         .getAllNotifications()
         .catch { error ->
             Log.e("NotificationViewModel", "Error loading notifications", error)
@@ -40,9 +42,16 @@ class NotificationViewModel @Inject constructor(
         tarihSaat: LocalDateTime,
         kullanici: String
     ) {
+        val token = tokenManager.getToken()
+        if (token.isNullOrBlank()) {
+            Log.e("NotificationViewModel", "Token not found! User must be logged in.")
+            return
+        }
+        
         viewModelScope.launch {
             try {
-                val notification = Notification(
+                val result = repository.addNotification(
+                    token = "Bearer $token",
                     firma = firma.trim(),
                     adSoyad = adSoyad.trim(),
                     telefon = telefon.trim(),
@@ -52,30 +61,50 @@ class NotificationViewModel @Inject constructor(
                     kullanici = kullanici.trim()
                 )
                 
-                repository.insertNotification(notification)
-                Log.d("NotificationViewModel", "Bildirim başarıyla eklendi")
+                result.fold(
+                    onSuccess = { response ->
+                        Log.d("NotificationViewModel", "Notification added successfully: ${response.message}")
+                    },
+                    onFailure = { error ->
+                        Log.e("NotificationViewModel", "Error adding notification", error)
+                    }
+                )
             } catch (e: Exception) {
                 Log.e("NotificationViewModel", "Error adding notification", e)
             }
         }
     }
     
-    fun deleteNotification(notification: Notification) {
+    fun deleteNotification(notification: ApiNotificationRequest) {
         viewModelScope.launch {
             try {
-                repository.deleteNotification(notification)
-                Log.d("NotificationViewModel", "Notification deleted: ${notification.id}")
+                val result = repository.deleteNotification(notification)
+                result.fold(
+                    onSuccess = { 
+                        Log.d("NotificationViewModel", "Notification deleted: ${notification.id}")
+                    },
+                    onFailure = { error ->
+                        Log.e("NotificationViewModel", "Error deleting notification", error)
+                    }
+                )
             } catch (e: Exception) {
                 Log.e("NotificationViewModel", "Error deleting notification", e)
             }
         }
     }
     
-    fun updateNotification(notification: Notification) {
+    fun updateNotification(notification: ApiNotificationRequest) {
         viewModelScope.launch {
             try {
-                repository.updateNotification(notification)
-                Log.d("NotificationViewModel", "Notification updated: ${notification.id}")
+                val result = repository.updateNotification(notification)
+                result.fold(
+                    onSuccess = { 
+                        Log.d("NotificationViewModel", "Notification updated: ${notification.id}")
+                    },
+                    onFailure = { error ->
+                        Log.e("NotificationViewModel", "Error updating notification", error)
+                    }
+                )
             } catch (e: Exception) {
                 Log.e("NotificationViewModel", "Error updating notification", e)
             }

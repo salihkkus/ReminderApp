@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.reminderapp.data.model.Notification
+import com.example.reminderapp.data.model.ApiNotificationRequest
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -19,7 +19,7 @@ import org.threeten.bp.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationItem(
-    notification: Notification,
+    notification: ApiNotificationRequest,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier
@@ -43,14 +43,14 @@ fun NotificationItem(
                     .padding(horizontal = 8.dp)
             ) {
                 Text(
-                    text = notification.firma,
+                    text = notification.firma ?: "Firma belirtilmemiş",
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 
                 Text(
-                    text = notification.adSoyad,
+                    text = notification.adSoyad ?: "Ad Soyad belirtilmemiş",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -59,7 +59,7 @@ fun NotificationItem(
                 )
                 
                 Text(
-                    text = "Tel: ${notification.telefon} | GSM: ${notification.gsm}",
+                    text = "Tel: ${notification.tel ?: "Belirtilmemiş"} | GSM: ${notification.cep ?: "Belirtilmemiş"}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -67,9 +67,9 @@ fun NotificationItem(
                     modifier = Modifier.padding(top = 4.dp)
                 )
                 
-                if (notification.aciklama.isNotBlank()) {
+                if (!notification.aciklama.isNullOrBlank()) {
                     Text(
-                        text = notification.aciklama,
+                        text = notification.aciklama ?: "",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
@@ -84,7 +84,7 @@ fun NotificationItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = notification.tarihSaat.format(dateFormatter),
+                        text = notification.tarih ?: "Tarih belirtilmemiş",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -96,7 +96,7 @@ fun NotificationItem(
                     )
                     
                     Text(
-                        text = notification.kullanici,
+                        text = "ID: ${notification.id}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -133,15 +133,16 @@ fun NotificationItem(
 fun NotificationItemPreview() {
     ReminderappTheme {
         NotificationItem(
-            notification = Notification(
+            notification = ApiNotificationRequest(
                 id = 1,
                 firma = "ABC Şirketi",
                 adSoyad = "Ahmet Yılmaz",
-                telefon = "0212 555 1234",
-                gsm = "0532 555 5678",
+                tel = "0212 555 1234",
+                cep = "0532 555 5678",
                 aciklama = "Muhasebe işlemleri için görüşme yapılacak",
-                tarihSaat = LocalDateTime.now(),
-                kullanici = "Salih Bey"
+                tarih = "2025-01-15T14:30:00Z",
+                okundu = false,
+                userId = 1
             ),
             onDelete = { },
             onEdit = { }

@@ -4,6 +4,8 @@ import com.example.reminderapp.data.model.ApiResponse
 import com.example.reminderapp.data.model.LoginRequest
 import com.example.reminderapp.data.model.LoginResponse
 import com.example.reminderapp.data.model.Reminder
+import com.example.reminderapp.data.model.ApiNotificationRequest
+import com.example.reminderapp.data.model.ApiNotificationResponse
 import retrofit2.http.*
 
 interface BilsoftApiService {
@@ -42,4 +44,12 @@ interface BilsoftApiService {
         @Header("Authorization") token: String,
         @Path("id") id: Long
     ): ApiResponse<Boolean>
+    
+    // === BİLDİRİM İŞLEMLERİ ===
+    
+    @POST("Ajanda/add")
+    suspend fun addNotification(
+        @Header("Authorization") token: String,
+        @Body notification: ApiNotificationRequest
+    ): ApiNotificationResponse
 }

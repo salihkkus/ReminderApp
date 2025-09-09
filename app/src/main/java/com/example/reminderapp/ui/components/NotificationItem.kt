@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.reminderapp.data.model.ApiNotificationRequest
+import com.example.reminderapp.data.model.ApiNotificationData
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -19,7 +19,7 @@ import org.threeten.bp.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationItem(
-    notification: ApiNotificationRequest,
+    notification: ApiNotificationData,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier
@@ -133,7 +133,7 @@ fun NotificationItem(
 fun NotificationItemPreview() {
     ReminderappTheme {
         NotificationItem(
-            notification = ApiNotificationRequest(
+            notification = ApiNotificationData(
                 id = 1,
                 firma = "ABC Şirketi",
                 adSoyad = "Ahmet Yılmaz",
@@ -142,7 +142,9 @@ fun NotificationItemPreview() {
                 aciklama = "Muhasebe işlemleri için görüşme yapılacak",
                 tarih = "2025-01-15T14:30:00Z",
                 okundu = false,
-                userId = 1
+                userId = 1,
+                user = "Salih Bey",
+                ajandaDosya = emptyList()
             ),
             onDelete = { },
             onEdit = { }

@@ -6,6 +6,8 @@ import com.example.reminderapp.data.model.LoginResponse
 import com.example.reminderapp.data.model.Reminder
 import com.example.reminderapp.data.model.ApiNotificationRequest
 import com.example.reminderapp.data.model.ApiNotificationResponse
+import com.example.reminderapp.data.model.ApiNotificationListRequest
+import com.example.reminderapp.data.model.ApiNotificationListResponse
 import retrofit2.http.*
 
 interface BilsoftApiService {
@@ -52,4 +54,10 @@ interface BilsoftApiService {
         @Header("Authorization") token: String,
         @Body notification: ApiNotificationRequest
     ): ApiNotificationResponse
+    
+    @POST("Ajanda/getall")
+    suspend fun getAllNotifications(
+        @Header("Authorization") token: String,
+        @Body request: ApiNotificationListRequest
+    ): ApiNotificationListResponse
 }

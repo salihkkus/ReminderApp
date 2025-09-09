@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.reminderapp.data.model.Priority
 import com.example.reminderapp.data.model.Reminder
-import com.example.reminderapp.data.model.ApiNotificationRequest
+import com.example.reminderapp.data.model.ApiNotificationData
 import com.example.reminderapp.ui.components.ReminderItem
 import com.example.reminderapp.ui.components.NotificationItem
 import com.example.reminderapp.ui.theme.ReminderappTheme
@@ -36,6 +36,8 @@ fun HomeScreen(
 ) {
     val reminders by homeViewModel.reminders.collectAsState()
     val notifications by notificationViewModel.notifications.collectAsState()
+    val isLoading by notificationViewModel.isLoading.collectAsState()
+    val error by notificationViewModel.error.collectAsState()
     
     // Başarı mesajı için state
     var showSuccessMessage by remember { mutableStateOf(true) }
@@ -110,21 +112,34 @@ fun HomeScreen(
                 }
             }
             
-            // Yeni Bildirim Butonu
-            Button(
-                onClick = { navController.navigate("add_notification") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
-                )
+            // Butonlar
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Yeni Bildirim", style = MaterialTheme.typography.titleMedium)
+                Button(
+                    onClick = { navController.navigate("add_notification") },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Text("Yeni Bildirim", style = MaterialTheme.typography.titleMedium)
+                }
+                
+                Button(
+                    onClick = { notificationViewModel.loadNotifications() },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary
+                    )
+                ) {
+                    Text("Yenile", style = MaterialTheme.typography.titleMedium)
+                }
             }
             
             // Ana içerik
-            if (reminders.isEmpty() && notifications.isEmpty()) {
+            if (reminders.isEmpty() && notifications.isEmpty() && !isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -140,7 +155,7 @@ fun HomeScreen(
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Text(
-                            text = "Yeni bildirim veya hatırlatma eklemek için + butonlarına tıklayın",
+                            text = "Yeni bildirim veya hatırlatma eklemek için butonları kullanın",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -154,11 +169,51 @@ fun HomeScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Loading durumu
+                    if (isLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    
+                    // Hata mesajı
+                    if (error != null) {
+                        item {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer
+                                )
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        text = "❌ Hata!",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                    Text(
+                                        text = error ?: "Bilinmeyen hata",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onErrorContainer,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    
                     // Bildirimler bölümü
                     if (notifications.isNotEmpty()) {
                         item {
                             Text(
-                                text = "📢 Bildirimler",
+                                text = "📢 Bildirimler (${notifications.size})",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(bottom = 8.dp)
@@ -182,7 +237,7 @@ fun HomeScreen(
                     if (reminders.isNotEmpty()) {
                         item {
                             Text(
-                                text = "📅 Hatırlatmalar",
+                                text = "📅 Hatırlatmalar (${reminders.size})",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(bottom = 8.dp)

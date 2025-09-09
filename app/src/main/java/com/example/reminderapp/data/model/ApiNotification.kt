@@ -88,3 +88,28 @@ data class ApiNotificationListResponse(
     @SerializedName("code")
     val code: String?
 )
+
+data class ApiNotificationData(
+    @SerializedName("id")
+    val id: Int,
+    @SerializedName("aciklama")
+    val aciklama: String?,
+    @SerializedName("adSoyad")
+    val adSoyad: String?,
+    @SerializedName("cep")
+    val cep: String?,
+    @SerializedName("firma")
+    val firma: String?,
+    @SerializedName("okundu")
+    val okundu: Boolean?,
+    @SerializedName("tarih")
+    val tarih: String?,
+    @SerializedName("tel")
+    val tel: String?,
+    @SerializedName("userId")
+    val userId: Int?,
+    @SerializedName("user")
+    val user: String? = null,
+    @SerializedName("ajandaDosya")
+    val ajandaDosya: List<String>? = null
+)

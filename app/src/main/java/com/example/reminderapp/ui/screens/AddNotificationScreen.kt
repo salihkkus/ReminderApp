@@ -1,5 +1,6 @@
 package com.example.reminderapp.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,6 +23,7 @@ import com.example.reminderapp.ui.theme.ReminderappTheme
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,8 +37,11 @@ fun AddNotificationScreen(
     var telefon by remember { mutableStateOf("") }
     var gsm by remember { mutableStateOf("") }
     var aciklama by remember { mutableStateOf("") }
-    var tarihSaat by remember { mutableStateOf(LocalDateTime.now()) }
+    var tarihSaat by remember { mutableStateOf<LocalDateTime?>(null) }
     var kullanici by remember { mutableStateOf("") }
+    
+    // Context for dialogs
+    val context = LocalContext.current
     
     // Success state
     var showSuccessMessage by remember { mutableStateOf(false) }
@@ -43,6 +49,34 @@ fun AddNotificationScreen(
     var errorMessage by remember { mutableStateOf("") }
     
     // Token artık NotificationViewModel içinde TokenManager ile alınıyor
+    
+    // Tarih/Saat seçici fonksiyonu
+    fun showDateTimePicker(onDateTimeSelected: (LocalDateTime) -> Unit) {
+        val calendar = Calendar.getInstance()
+        
+        // Önce tarih seçici
+        val datePickerDialog = android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                // Sonra saat seçici
+                val timePickerDialog = android.app.TimePickerDialog(
+                    context,
+                    { _, hour, minute ->
+                        val selectedDateTime = LocalDateTime.of(year, month + 1, dayOfMonth, hour, minute)
+                        onDateTimeSelected(selectedDateTime)
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                )
+                timePickerDialog.show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.show()
+    }
     
     Scaffold(
         topBar = {
@@ -133,9 +167,15 @@ fun AddNotificationScreen(
                         supportingText = { Text("Bildirim açıklamasını girin") }
                     )
                     
-                    // Tarih Saat
+                    // Tarih Saat - Tıklanabilir seçici
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showDateTimePicker { selectedDateTime ->
+                                    tarihSaat = selectedDateTime
+                                }
+                            },
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
@@ -149,12 +189,17 @@ fun AddNotificationScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = tarihSaat.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                                text = tarihSaat?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
+                                    ?: "Tarih ve saat seçiniz",
                                 style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(top = 8.dp)
+                                modifier = Modifier.padding(top = 8.dp),
+                                color = if (tarihSaat == null) 
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                else 
+                                    MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "Not: Şu anda sadece mevcut tarih/saat kullanılıyor",
+                                text = "Tıklayarak tarih ve saat seçebilirsiniz",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                 modifier = Modifier.padding(top = 4.dp)
@@ -179,9 +224,10 @@ fun AddNotificationScreen(
                     onClick = {
                         // Validation
                         if (firma.isBlank() || adSoyad.isBlank() || telefon.isBlank() || 
-                            gsm.isBlank() || aciklama.isBlank() || kullanici.isBlank()) {
+                            gsm.isBlank() || aciklama.isBlank() || kullanici.isBlank() || 
+                            tarihSaat == null) {
                             showErrorMessage = true
-                            errorMessage = "Lütfen tüm alanları doldurun"
+                            errorMessage = "Lütfen tüm alanları doldurun ve tarih/saat seçin"
                             return@Button
                         }
                         
@@ -192,7 +238,7 @@ fun AddNotificationScreen(
                             telefon = telefon,
                             gsm = gsm,
                             aciklama = aciklama,
-                            tarihSaat = tarihSaat,
+                            tarihSaat = tarihSaat!!, // Null check yapıldığı için güvenli
                             kullanici = kullanici
                         )
                         

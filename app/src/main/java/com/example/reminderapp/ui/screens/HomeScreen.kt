@@ -224,7 +224,7 @@ fun HomeScreen(
                             NotificationItem(
                                 notification = notification,
                                 onDelete = { notificationViewModel.deleteNotification(notification) },
-                                onEdit = { /* TODO: Navigate to edit notification */ }
+                                onEdit = { navController.navigate("edit_notification/${notification.id}") }
                             )
                         }
                         

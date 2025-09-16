@@ -51,6 +51,10 @@ fun ReminderApp() {
             composable("add_notification") {
                 AddNotificationScreen(navController = navController)
             }
+            composable("edit_notification/{id}") { backStackEntry ->
+                val idArg = backStackEntry.arguments?.getString("id")
+                AddNotificationScreen(navController = navController, editId = idArg?.toIntOrNull())
+            }
         }
     }
 }

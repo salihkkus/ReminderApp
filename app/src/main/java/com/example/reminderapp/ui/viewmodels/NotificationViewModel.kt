@@ -143,7 +143,12 @@ class NotificationViewModel @Inject constructor(
     fun updateNotification(notification: ApiNotificationData) {
         viewModelScope.launch {
             try {
-                val result = repository.updateNotification(notification)
+                val token = tokenManager.getToken()
+                if (token.isNullOrBlank()) {
+                    Log.e("NotificationViewModel", "Token not found! User must be logged in.")
+                    return@launch
+                }
+                val result = repository.updateNotification(token, notification)
                 result.fold(
                     onSuccess = { 
                         Log.d("NotificationViewModel", "Notification updated: ${notification.id}")

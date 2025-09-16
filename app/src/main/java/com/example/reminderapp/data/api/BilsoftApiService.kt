@@ -66,4 +66,10 @@ interface BilsoftApiService {
         @Header("Authorization") token: String,
         @Body request: ApiNotificationRequest
     ): ApiNotificationResponse
+
+    @PUT("Ajanda/update")
+    suspend fun updateNotification(
+        @Header("Authorization") token: String,
+        @Body request: ApiNotificationRequest
+    ): ApiNotificationResponse
 }

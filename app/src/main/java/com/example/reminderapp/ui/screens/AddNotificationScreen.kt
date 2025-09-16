@@ -29,8 +29,10 @@ import java.util.*
 @Composable
 fun AddNotificationScreen(
     navController: NavController,
-    viewModel: NotificationViewModel = hiltViewModel()
+    viewModel: NotificationViewModel = hiltViewModel(),
+    editId: Int? = null
 ) {
+    val notifications by viewModel.notifications.collectAsState()
     // Form state variables
     var firma by remember { mutableStateOf("") }
     var adSoyad by remember { mutableStateOf("") }
@@ -39,6 +41,7 @@ fun AddNotificationScreen(
     var aciklama by remember { mutableStateOf("") }
     var tarihSaat by remember { mutableStateOf<LocalDateTime?>(null) }
     var kullanici by remember { mutableStateOf("") }
+    var isEditMode by remember { mutableStateOf(editId != null) }
     
     // Context for dialogs
     val context = LocalContext.current
@@ -48,7 +51,32 @@ fun AddNotificationScreen(
     var showErrorMessage by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     
-    // Token artık NotificationViewModel içinde TokenManager ile alınıyor
+    // Eğer düzenleme modundaysak mevcut verileri doldur
+    LaunchedEffect(editId, notifications) {
+        if (editId != null) {
+            val current = notifications.firstOrNull { it.id == editId }
+            current?.let { n ->
+                firma = n.firma.orEmpty()
+                adSoyad = n.adSoyad.orEmpty()
+                telefon = n.tel.orEmpty()
+                gsm = n.cep.orEmpty()
+                aciklama = n.aciklama.orEmpty()
+                // API tarih formatı ISO 8601 bekliyor; ekranda gösterim için parse etmeye çalış
+                try {
+                    // Basit bir parse: Z içeren ISO tarihleri LocalDateTime'a çevirmek için 'Z' kısmını kaldırıyoruz
+                    val iso = n.tarih
+                    if (!iso.isNullOrBlank()) {
+                        val cleaned = iso.replace("Z", "")
+                        val parsed = LocalDateTime.parse(cleaned.substring(0, 19))
+                        tarihSaat = parsed
+                    }
+                } catch (_: Exception) { /* gösterim için zorunlu değil */ }
+                // Kullanıcı alanı API'den gelmiyor olabilir
+                kullanici = n.user.orEmpty()
+                isEditMode = true
+            }
+        }
+    }
     
     // Tarih/Saat seçici fonksiyonu
     fun showDateTimePicker(onDateTimeSelected: (LocalDateTime) -> Unit) {
@@ -219,7 +247,7 @@ fun AddNotificationScreen(
                 }
             }
             
-                // Kaydet butonu
+                // Kaydet / Güncelle butonu
                 Button(
                     onClick = {
                         // Validation
@@ -231,16 +259,37 @@ fun AddNotificationScreen(
                             return@Button
                         }
                         
-                        // Add notification via API (token otomatik alınıyor)
-                        viewModel.addNotification(
-                            firma = firma,
-                            adSoyad = adSoyad,
-                            telefon = telefon,
-                            gsm = gsm,
-                            aciklama = aciklama,
-                            tarihSaat = tarihSaat!!, // Null check yapıldığı için güvenli
-                            kullanici = kullanici
-                        )
+                        if (isEditMode && editId != null) {
+                            // Güncelle
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                            val formattedDate = tarihSaat!!.format(formatter)
+                            viewModel.updateNotification(
+                                notification = com.example.reminderapp.data.model.ApiNotificationData(
+                                    id = editId,
+                                    aciklama = aciklama,
+                                    adSoyad = adSoyad,
+                                    cep = gsm,
+                                    firma = firma,
+                                    okundu = false,
+                                    tarih = formattedDate,
+                                    tel = telefon,
+                                    userId = null,
+                                    user = kullanici,
+                                    ajandaDosya = emptyList()
+                                )
+                            )
+                        } else {
+                            // Yeni ekle
+                            viewModel.addNotification(
+                                firma = firma,
+                                adSoyad = adSoyad,
+                                telefon = telefon,
+                                gsm = gsm,
+                                aciklama = aciklama,
+                                tarihSaat = tarihSaat!!, // Null check yapıldığı için güvenli
+                                kullanici = kullanici
+                            )
+                        }
                         
                         showSuccessMessage = true
                     },
@@ -249,7 +298,7 @@ fun AddNotificationScreen(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Kaydet", style = MaterialTheme.typography.titleMedium)
+                    Text(if (isEditMode) "Güncelle" else "Kaydet", style = MaterialTheme.typography.titleMedium)
                 }
             
             // Başarı mesajı

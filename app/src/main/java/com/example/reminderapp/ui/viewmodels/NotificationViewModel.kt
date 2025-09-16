@@ -118,7 +118,12 @@ class NotificationViewModel @Inject constructor(
     fun deleteNotification(notification: ApiNotificationData) {
         viewModelScope.launch {
             try {
-                val result = repository.deleteNotification(notification)
+                val token = tokenManager.getToken()
+                if (token.isNullOrBlank()) {
+                    Log.e("NotificationViewModel", "Token not found! User must be logged in.")
+                    return@launch
+                }
+                val result = repository.deleteNotification(token, notification)
                 result.fold(
                     onSuccess = { 
                         Log.d("NotificationViewModel", "Notification deleted: ${notification.id}")

@@ -60,4 +60,10 @@ interface BilsoftApiService {
         @Header("Authorization") token: String,
         @Body request: ApiNotificationListRequest
     ): ApiNotificationListResponse
+
+    @POST("Ajanda/delete")
+    suspend fun deleteNotification(
+        @Header("Authorization") token: String,
+        @Body request: ApiNotificationRequest
+    ): ApiNotificationResponse
 }

@@ -112,8 +112,28 @@ class NotificationRepository @Inject constructor(
     }
     
     // Silme işlemi (şimdilik boş)
-    suspend fun deleteNotification(notification: ApiNotificationData): Result<Boolean> {
-        return Result.success(true)
+    suspend fun deleteNotification(token: String, notification: ApiNotificationData): Result<Boolean> {
+        return try {
+            val request = ApiNotificationRequest(
+                aciklama = notification.aciklama,
+                adSoyad = notification.adSoyad,
+                cep = notification.cep,
+                firma = notification.firma,
+                id = notification.id,
+                okundu = notification.okundu,
+                tarih = notification.tarih,
+                tel = notification.tel,
+                userId = notification.userId
+            )
+            val response = apiService.deleteNotification("Bearer $token", request)
+            if (response.success) {
+                Result.success(true)
+            } else {
+                Result.failure(Exception(response.message ?: "Silme başarısız"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
     
     // Güncelleme işlemi (şimdilik boş)

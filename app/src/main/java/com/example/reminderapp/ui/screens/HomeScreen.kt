@@ -54,20 +54,8 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ajanda Modülü") },
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO: Open drawer */ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
-                }
+                title = { Text("Ajanda Modülü") }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO: Navigate to add reminder */ }
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Hatırlatma Ekle")
-            }
         }
     ) { padding ->
         Column(
@@ -147,6 +135,192 @@ fun HomeScreen(
                 }
             }
             
+            // Filtre durumları (bildirimler için)
+            var nameQuery by remember { mutableStateOf("") }
+            var startDateText by remember { mutableStateOf("") }
+            var endDateText by remember { mutableStateOf("") }
+            var selectedUser by remember { mutableStateOf<String?>(null) }
+            var statusFilter by remember { mutableStateOf(0) } // 0: Tümü, 1: Tamamlanan (okundu=true), 2: Tamamlanmayan (okundu=false)
+            var filteredNotifications by remember(notifications) { mutableStateOf(notifications) }
+
+            // Kullanıcı listesi (mevcut bildirimlerden)
+            val userOptions = remember(notifications) {
+                notifications.mapNotNull { it.user }.distinct().sorted()
+            }
+
+            // Filtre formu (bildirimlerin üstünde)
+            if (notifications.isNotEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Filtrele",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        // İsim (ad soyad) arama
+                        OutlinedTextField(
+                            value = nameQuery,
+                            onValueChange = { nameQuery = it },
+                            label = { Text("İsim ile ara (Ad Soyad)") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+
+                        // Tarih aralığı (dd.MM.yyyy)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            OutlinedTextField(
+                                value = startDateText,
+                                onValueChange = { startDateText = it },
+                                label = { Text("Başlangıç (dd.MM.yyyy)") },
+                                modifier = Modifier.weight(1f),
+                                singleLine = true
+                            )
+                            OutlinedTextField(
+                                value = endDateText,
+                                onValueChange = { endDateText = it },
+                                label = { Text("Bitiş (dd.MM.yyyy)") },
+                                modifier = Modifier.weight(1f),
+                                singleLine = true
+                            )
+                        }
+
+                        // Kullanıcı seçimi (mevcut bildirimlerden)
+                        if (userOptions.isNotEmpty()) {
+                            var userMenuExpanded by remember { mutableStateOf(false) }
+                            ExposedDropdownMenuBox(
+                                expanded = userMenuExpanded,
+                                onExpandedChange = { userMenuExpanded = !userMenuExpanded }
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedUser ?: "",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("Kullanıcı (opsiyonel)") },
+                                    modifier = Modifier
+                                        .menuAnchor()
+                                        .fillMaxWidth(),
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = userMenuExpanded) }
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = userMenuExpanded,
+                                    onDismissRequest = { userMenuExpanded = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("(Hepsi)") },
+                                        onClick = {
+                                            selectedUser = null
+                                            userMenuExpanded = false
+                                        }
+                                    )
+                                    userOptions.forEach { user ->
+                                        DropdownMenuItem(
+                                            text = { Text(user) },
+                                            onClick = {
+                                                selectedUser = user
+                                                userMenuExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Durum filtresi: Tümü / Tamamlanan / Tamamlanmayan
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            FilterChip(
+                                selected = statusFilter == 0,
+                                onClick = { statusFilter = 0 },
+                                label = { Text("Tümü") }
+                            )
+                            FilterChip(
+                                selected = statusFilter == 1,
+                                onClick = { statusFilter = 1 },
+                                label = { Text("Tamamlanan") }
+                            )
+                            FilterChip(
+                                selected = statusFilter == 2,
+                                onClick = { statusFilter = 2 },
+                                label = { Text("Tamamlanmayan") }
+                            )
+                        }
+
+                        // Ara butonu
+                        Button(
+                            onClick = {
+                                // Mevcut listeyi filtrele
+                                var result = notifications
+
+                                // İsim filtre
+                                if (nameQuery.isNotBlank()) {
+                                    val q = nameQuery.trim().lowercase()
+                                    result = result.filter { (it.adSoyad ?: "").lowercase().contains(q) }
+                                }
+
+                                // Tarih aralığı filtre (bildirim.tarih ISO olabilir)
+                                fun parseIsoToLocalDate(iso: String?): org.threeten.bp.LocalDate? {
+                                    if (iso.isNullOrBlank()) return null
+                                    return try {
+                                        val cleaned = iso.replace("Z", "")
+                                        val dt = org.threeten.bp.LocalDateTime.parse(cleaned.substring(0, 19))
+                                        dt.toLocalDate()
+                                    } catch (e: Exception) { null }
+                                }
+                                fun parseUiDate(text: String): org.threeten.bp.LocalDate? {
+                                    return try {
+                                        org.threeten.bp.LocalDate.parse(text, org.threeten.bp.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                                    } catch (e: Exception) { null }
+                                }
+                                val startDate = parseUiDate(startDateText)
+                                val endDate = parseUiDate(endDateText)
+                                if (startDate != null) {
+                                    result = result.filter { n ->
+                                        val d = parseIsoToLocalDate(n.tarih)
+                                        d != null && (d.isAfter(startDate) || d.isEqual(startDate))
+                                    }
+                                }
+                                if (endDate != null) {
+                                    result = result.filter { n ->
+                                        val d = parseIsoToLocalDate(n.tarih)
+                                        d != null && (d.isBefore(endDate) || d.isEqual(endDate))
+                                    }
+                                }
+
+                                // Kullanıcı filtre
+                                if (!selectedUser.isNullOrBlank()) {
+                                    result = result.filter { it.user == selectedUser }
+                                }
+
+                                // Durum filtre (okundu alanı)
+                                result = when (statusFilter) {
+                                    1 -> result.filter { it.okundu == true }
+                                    2 -> result.filter { it.okundu != true }
+                                    else -> result
+                                }
+
+                                filteredNotifications = result
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Ara")
+                        }
+                    }
+                }
+            }
+
             // Ana içerik
             if (reminders.isEmpty() && notifications.isEmpty() && !isLoading) {
                 Box(
@@ -219,17 +393,17 @@ fun HomeScreen(
                     }
                     
                     // Bildirimler bölümü
-                    if (notifications.isNotEmpty()) {
+                    if (filteredNotifications.isNotEmpty()) {
                         item {
                             Text(
-                                text = "📢 Bildirimler (${notifications.size})",
+                                text = "📢 Bildirimler (${filteredNotifications.size})",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
                         
-                        items(notifications) { notification ->
+                        items(filteredNotifications) { notification ->
                             NotificationItem(
                                 notification = notification,
                                 onDelete = { notificationViewModel.deleteNotification(notification) },

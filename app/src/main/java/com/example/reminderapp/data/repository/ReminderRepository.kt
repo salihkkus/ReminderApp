@@ -1,6 +1,5 @@
 package com.example.reminderapp.data.repository
 
-import com.example.reminderapp.data.api.BilsoftApiService
 import com.example.reminderapp.data.local.ReminderDao
 import com.example.reminderapp.data.model.Reminder
 import kotlinx.coroutines.flow.Flow
@@ -10,8 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ReminderRepository @Inject constructor(
-    private val reminderDao: ReminderDao,
-    private val apiService: BilsoftApiService
+    private val reminderDao: ReminderDao
 ) {
     
     // Local database operations
@@ -33,56 +31,5 @@ class ReminderRepository @Inject constructor(
     suspend fun updateCompletionStatus(id: Long, isCompleted: Boolean) =
         reminderDao.updateCompletionStatus(id, isCompleted)
     
-    // API operations
-    suspend fun syncRemindersFromServer(token: String) {
-        try {
-            val response = apiService.getReminders(token)
-            if (response.success && response.data != null) {
-                response.data.forEach { reminder ->
-                    reminderDao.insertReminder(reminder)
-                }
-            }
-        } catch (e: Exception) {
-            // Handle error - could be logged or reported
-        }
-    }
-    
-    suspend fun createReminderOnServer(token: String, reminder: Reminder): Result<Reminder> {
-        return try {
-            val response = apiService.createReminder(token, reminder)
-            if (response.success && response.data != null) {
-                Result.success(response.data)
-            } else {
-                Result.failure(Exception(response.message ?: "Unknown error"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-    
-    suspend fun updateReminderOnServer(token: String, reminder: Reminder): Result<Reminder> {
-        return try {
-            val response = apiService.updateReminder(token, reminder.id, reminder)
-            if (response.success && response.data != null) {
-                Result.success(response.data)
-            } else {
-                Result.failure(Exception(response.message ?: "Unknown error"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-    
-    suspend fun deleteReminderOnServer(token: String, id: Long): Result<Boolean> {
-        return try {
-            val response = apiService.deleteReminder(token, id)
-            if (response.success && response.data == true) {
-                Result.success(true)
-            } else {
-                Result.failure(Exception(response.message ?: "Unknown error"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+    // Resmi olmayan API operasyonları kaldırıldı; Room üzerinden çalışıyoruz
 }

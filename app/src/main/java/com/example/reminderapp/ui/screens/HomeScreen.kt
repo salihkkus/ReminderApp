@@ -26,6 +26,7 @@ import com.example.reminderapp.ui.theme.ReminderappTheme
 import com.example.reminderapp.ui.viewmodels.HomeViewModel
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
 import org.threeten.bp.LocalDateTime
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +43,14 @@ fun HomeScreen(
     // Başarı mesajı için state
     var showSuccessMessage by remember { mutableStateOf(true) }
     
+    // Başarı mesajını 3 saniye sonra otomatik gizle
+    LaunchedEffect(showSuccessMessage) {
+        if (showSuccessMessage) {
+            delay(1700)
+            showSuccessMessage = false
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(

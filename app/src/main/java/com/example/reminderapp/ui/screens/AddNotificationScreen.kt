@@ -278,6 +278,10 @@ fun AddNotificationScreen(
                                     ajandaDosya = emptyList()
                                 )
                             )
+                            // Home ekranına dön
+                            navController.navigate("home") {
+                                popUpTo("home") { inclusive = true }
+                            }
                         } else {
                             // Yeni ekle
                             viewModel.addNotification(
@@ -289,6 +293,10 @@ fun AddNotificationScreen(
                                 tarihSaat = tarihSaat!!, // Null check yapıldığı için güvenli
                                 kullanici = kullanici
                             )
+                            // Home ekranına dön
+                            navController.navigate("home") {
+                                popUpTo("home") { inclusive = true }
+                            }
                         }
                         
                         showSuccessMessage = true

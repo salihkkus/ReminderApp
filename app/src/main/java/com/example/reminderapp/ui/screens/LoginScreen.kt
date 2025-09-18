@@ -1,5 +1,6 @@
 package com.example.reminderapp.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,9 +61,9 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(vertical = 32.dp)
         ) {
-            Text(
-                text = "📱",
-                style = MaterialTheme.typography.displayLarge
+            Image(
+                painter = painterResource(id = com.example.reminderapp.R.mipmap.bilsoft),
+                contentDescription = "Bilsoft Logo"
             )
             Text(
                 text = "Bilsoft Ajanda Modülü",

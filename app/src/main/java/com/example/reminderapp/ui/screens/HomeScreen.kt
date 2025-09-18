@@ -1,5 +1,6 @@
 package com.example.reminderapp.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -53,9 +55,23 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Ajanda Modülü") }
-            )
+            Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = com.example.reminderapp.R.mipmap.bilsoft),
+                        contentDescription = "Bilsoft Logo",
+                        modifier = Modifier.fillMaxWidth(0.8f)
+                    )
+                }
+                CenterAlignedTopAppBar(
+                    title = { Text("Ajanda Modülü") }
+                )
+            }
         }
     ) { padding ->
         Column(

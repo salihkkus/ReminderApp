@@ -7,6 +7,8 @@ import com.example.reminderapp.data.api.BilsoftApiService
 import com.example.reminderapp.data.model.LoginRequest
 import com.example.reminderapp.data.model.UserInfo
 import com.example.reminderapp.data.local.TokenManager
+import com.example.reminderapp.data.local.UserPreferences
+import com.example.reminderapp.data.local.SavedCredentials
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val apiService: BilsoftApiService,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
     
     private val _loginState = MutableStateFlow(LoginState())
@@ -26,7 +29,8 @@ class LoginViewModel @Inject constructor(
     fun login(
         vergiNumarasi: String,
         kullaniciAdi: String,
-        kullaniciSifre: String
+        kullaniciSifre: String,
+        rememberMe: Boolean = false
     ) {
         // Input validation
         if (vergiNumarasi.isBlank() || kullaniciAdi.isBlank() || kullaniciSifre.isBlank()) {
@@ -65,6 +69,22 @@ class LoginViewModel @Inject constructor(
                         userId = response.data.userInfo?.userId,
                         userName = response.data.userInfo?.userName
                     )
+                    
+                    // Beni Hatırla seçildiyse kullanıcı bilgilerini kaydet
+                    if (rememberMe) {
+                        userPreferences.setRememberMe(true)
+                        userPreferences.saveUserCredentials(
+                            vergiNumarasi = vergiNumarasi.trim(),
+                            kullaniciAdi = kullaniciAdi.trim(),
+                            kullaniciSifre = kullaniciSifre.trim(),
+                            token = response.data.token
+                        )
+                        Log.d("LoginViewModel", "User credentials saved for remember me")
+                    } else {
+                        userPreferences.setRememberMe(false)
+                        userPreferences.clearCredentials()
+                        Log.d("LoginViewModel", "Remember me disabled, credentials cleared")
+                    }
                     
                     _loginState.value = LoginState(
                         isSuccess = true,
@@ -125,6 +145,42 @@ class LoginViewModel @Inject constructor(
     
     fun resetState() {
         Log.d("LoginViewModel", "Resetting login state")
+        _loginState.value = LoginState()
+    }
+    
+    // Kaydedilmiş kullanıcı bilgilerini al
+    fun getSavedCredentials(): SavedCredentials? {
+        return userPreferences.getSavedCredentials()
+    }
+    
+    // Beni Hatırla durumunu kontrol et
+    fun getRememberMe(): Boolean {
+        return userPreferences.getRememberMe()
+    }
+    
+    // Otomatik giriş yap
+    fun autoLogin(): Boolean {
+        val savedCredentials = getSavedCredentials()
+        val rememberMe = getRememberMe()
+        
+        if (savedCredentials != null && rememberMe) {
+            Log.d("LoginViewModel", "Auto login with saved credentials")
+            login(
+                vergiNumarasi = savedCredentials.vergiNumarasi,
+                kullaniciAdi = savedCredentials.kullaniciAdi,
+                kullaniciSifre = savedCredentials.kullaniciSifre,
+                rememberMe = true
+            )
+            return true
+        }
+        return false
+    }
+    
+    // Çıkış yap
+    fun logout() {
+        Log.d("LoginViewModel", "Logging out user")
+        userPreferences.clearAll()
+        tokenManager.clearToken()
         _loginState.value = LoginState()
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ import com.example.reminderapp.ui.components.NotificationItem
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import com.example.reminderapp.ui.viewmodels.HomeViewModel
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
+import com.example.reminderapp.ui.viewmodels.LoginViewModel
 import org.threeten.bp.LocalDateTime
 import kotlinx.coroutines.delay
 
@@ -35,19 +37,35 @@ import kotlinx.coroutines.delay
 fun HomeScreen(
     navController: NavController,
     homeViewModel: HomeViewModel = hiltViewModel(),
-    notificationViewModel: NotificationViewModel = hiltViewModel()
+    notificationViewModel: NotificationViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val reminders by homeViewModel.reminders.collectAsState()
     val notifications by notificationViewModel.notifications.collectAsState()
     val isLoading by notificationViewModel.isLoading.collectAsState()
     val error by notificationViewModel.error.collectAsState()
     
-    // Başarı mesajı için state
-    var showSuccessMessage by remember { mutableStateOf(true) }
+    // Başarı mesajı için state - sadece manuel giriş için göster
+    var showSuccessMessage by remember { mutableStateOf(false) }
+    var isAutoLogin by remember { mutableStateOf(true) }
     
-    // Başarı mesajını 3 saniye sonra otomatik gizle
+    // İlk yüklemede otomatik giriş kontrolü
+    LaunchedEffect(Unit) {
+        val savedCredentials = loginViewModel.getSavedCredentials()
+        val rememberMe = loginViewModel.getRememberMe()
+        
+        if (savedCredentials != null && rememberMe) {
+            isAutoLogin = true
+            showSuccessMessage = false
+        } else {
+            isAutoLogin = false
+            showSuccessMessage = true
+        }
+    }
+    
+    // Başarı mesajını 3 saniye sonra otomatik gizle (sadece manuel giriş için)
     LaunchedEffect(showSuccessMessage) {
-        if (showSuccessMessage) {
+        if (showSuccessMessage && !isAutoLogin) {
             delay(1700)
             showSuccessMessage = false
         }
@@ -69,7 +87,23 @@ fun HomeScreen(
                     )
                 }
                 CenterAlignedTopAppBar(
-                    title = { Text("Ajanda Modülü") }
+                    title = { Text("Ajanda Modülü") },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                loginViewModel.logout()
+                                navController.navigate("login") {
+                                    popUpTo("home") { inclusive = true }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.ExitToApp,
+                                contentDescription = "Çıkış Yap",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
                 )
             }
         }
@@ -79,8 +113,8 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Başarı mesajı
-            if (showSuccessMessage) {
+            // Başarı mesajı (sadece manuel giriş için)
+            if (showSuccessMessage && !isAutoLogin) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -510,6 +544,7 @@ private fun HomeScreenWithData(
     reminders: List<Reminder>
 ) {
     var showSuccessMessage by remember { mutableStateOf(true) }
+    var isAutoLogin by remember { mutableStateOf(false) } // Preview için false
     
     Scaffold(
         topBar = {
@@ -535,8 +570,8 @@ private fun HomeScreenWithData(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Başarı mesajı
-            if (showSuccessMessage) {
+            // Başarı mesajı (sadece manuel giriş için)
+            if (showSuccessMessage && !isAutoLogin) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()

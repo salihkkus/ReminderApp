@@ -29,8 +29,20 @@ fun LoginScreen(
     var vergiNumarasi by remember { mutableStateOf("0123456010") }
     var kullaniciAdi by remember { mutableStateOf("sskarakussalih77@gmail.com") }
     var kullaniciSifre by remember { mutableStateOf("04a7b4c1") }
+    var rememberMe by remember { mutableStateOf(false) }
     
     val loginState by viewModel.loginState.collectAsState()
+    
+    // Kaydedilmiş bilgileri yükle
+    LaunchedEffect(Unit) {
+        val savedCredentials = viewModel.getSavedCredentials()
+        if (savedCredentials != null && viewModel.getRememberMe()) {
+            vergiNumarasi = savedCredentials.vergiNumarasi
+            kullaniciAdi = savedCredentials.kullaniciAdi
+            kullaniciSifre = savedCredentials.kullaniciSifre
+            rememberMe = true
+        }
+    }
     
     // Giriş başarılı olduğunda navigation
     LaunchedEffect(loginState) {
@@ -124,12 +136,29 @@ fun LoginScreen(
                     supportingText = { Text("Şifrenizi girin") }
                 )
                 
+                // Beni Hatırla checkbox'ı
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = rememberMe,
+                        onCheckedChange = { rememberMe = it }
+                    )
+                    Text(
+                        text = "Beni Hatırla",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+                
                 Button(
                     onClick = {
                         viewModel.login(
                             vergiNumarasi = vergiNumarasi,
                             kullaniciAdi = kullaniciAdi,
-                            kullaniciSifre = kullaniciSifre
+                            kullaniciSifre = kullaniciSifre,
+                            rememberMe = rememberMe
                         )
                     },
                     modifier = Modifier.fillMaxWidth(),

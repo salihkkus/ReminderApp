@@ -15,9 +15,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -25,6 +32,7 @@ import com.example.reminderapp.ui.screens.HomeScreen
 import com.example.reminderapp.ui.screens.LoginScreen
 import com.example.reminderapp.ui.screens.AddNotificationScreen
 import com.example.reminderapp.ui.theme.ReminderappTheme
+import com.example.reminderapp.ui.viewmodels.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -108,11 +116,42 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ReminderApp() {
     val navController = rememberNavController()
+    val loginViewModel: LoginViewModel = hiltViewModel()
+    val loginState by loginViewModel.loginState.collectAsState()
+    
+    // Otomatik giriş durumunu kontrol et
+    var isAutoLoginChecked by remember { mutableStateOf(false) }
+    var shouldShowLoginScreen by remember { mutableStateOf(true) }
+    
+    // Otomatik giriş kontrolü
+    LaunchedEffect(Unit) {
+        if (!isAutoLoginChecked) {
+            isAutoLoginChecked = true
+            val autoLoginSuccess = loginViewModel.autoLogin()
+            if (autoLoginSuccess) {
+                android.util.Log.d("ReminderApp", "Auto login initiated")
+                shouldShowLoginScreen = false
+            } else {
+                android.util.Log.d("ReminderApp", "No saved credentials found")
+                shouldShowLoginScreen = true
+            }
+        }
+    }
+    
+    // Otomatik giriş başarılı olduğunda home'a yönlendir
+    LaunchedEffect(loginState.isSuccess) {
+        if (loginState.isSuccess) {
+            android.util.Log.d("ReminderApp", "Auto login successful, navigating to home")
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
     
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "login",
+            startDestination = if (shouldShowLoginScreen) "login" else "home",
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("login") {

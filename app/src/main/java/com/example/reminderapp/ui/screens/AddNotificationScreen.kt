@@ -259,6 +259,10 @@ fun AddNotificationScreen(
                             return@Button
                         }
                         
+                        // Loading state'i göster
+                        showSuccessMessage = false
+                        showErrorMessage = false
+                        
                         if (isEditMode && editId != null) {
                             // Güncelle
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -278,10 +282,6 @@ fun AddNotificationScreen(
                                     ajandaDosya = emptyList()
                                 )
                             )
-                            // Home ekranına dön
-                            navController.navigate("home") {
-                                popUpTo("home") { inclusive = true }
-                            }
                         } else {
                             // Yeni ekle
                             viewModel.addNotification(
@@ -293,10 +293,6 @@ fun AddNotificationScreen(
                                 tarihSaat = tarihSaat!!, // Null check yapıldığı için güvenli
                                 kullanici = kullanici
                             )
-                            // Home ekranına dön
-                            navController.navigate("home") {
-                                popUpTo("home") { inclusive = true }
-                            }
                         }
                         
                         showSuccessMessage = true
@@ -326,11 +322,27 @@ fun AddNotificationScreen(
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = "Ana sayfaya dönmek için geri butonuna basın",
+                            text = "Alarm kuruldu ve bildirim zamanında gelecek",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(top = 4.dp)
                         )
+                        
+                        Button(
+                            onClick = {
+                                navController.navigate("home") {
+                                    popUpTo("home") { inclusive = true }
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text("Ana Sayfaya Dön")
+                        }
                     }
                 }
             }

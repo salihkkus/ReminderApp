@@ -43,14 +43,14 @@ fun NotificationItem(
                     .padding(horizontal = 8.dp)
             ) {
                 Text(
-                    text = notification.firma ?: "Firma belirtilmemiş",
+                    text = "Firma: ${notification.firma ?: "Belirtilmemiş"}",
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 
                 Text(
-                    text = notification.adSoyad ?: "Ad Soyad belirtilmemiş",
+                    text = "Ad Soyad: ${notification.adSoyad ?: "Belirtilmemiş"}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -69,7 +69,7 @@ fun NotificationItem(
                 
                 if (!notification.aciklama.isNullOrBlank()) {
                     Text(
-                        text = notification.aciklama ?: "",
+                        text = "Açıklama: ${notification.aciklama}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
@@ -78,29 +78,12 @@ fun NotificationItem(
                     )
                 }
                 
-                Row(
-                    modifier = Modifier.padding(top = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = notification.tarih ?: "Tarih belirtilmemiş",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    
-                    Text(
-                        text = "•",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    
-                    Text(
-                        text = "ID: ${notification.id}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = "Tarih: ${notification.tarih ?: "Belirtilmemiş"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
             
             // Aksiyon butonları

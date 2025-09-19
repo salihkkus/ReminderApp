@@ -88,7 +88,7 @@ class NotificationViewModel @Inject constructor(
         
         viewModelScope.launch {
             try {
-                val result = repository.addNotification(
+                val result = repository.addNotificationWithAlarm(
                     token = "Bearer $token",
                     firma = firma.trim(),
                     adSoyad = adSoyad.trim(),
@@ -110,7 +110,15 @@ class NotificationViewModel @Inject constructor(
                     }
                 )
             } catch (e: Exception) {
-                Log.e("NotificationViewModel", "Error adding notification", e)
+                when (e) {
+                    is kotlinx.coroutines.CancellationException -> {
+                        Log.w("NotificationViewModel", "Notification add operation was cancelled")
+                        // CancellationException'ı yeniden fırlatma, bu normal bir durum
+                    }
+                    else -> {
+                        Log.e("NotificationViewModel", "Error adding notification", e)
+                    }
+                }
             }
         }
     }
@@ -135,7 +143,14 @@ class NotificationViewModel @Inject constructor(
                     }
                 )
             } catch (e: Exception) {
-                Log.e("NotificationViewModel", "Error deleting notification", e)
+                when (e) {
+                    is kotlinx.coroutines.CancellationException -> {
+                        Log.w("NotificationViewModel", "Notification delete operation was cancelled")
+                    }
+                    else -> {
+                        Log.e("NotificationViewModel", "Error deleting notification", e)
+                    }
+                }
             }
         }
     }
@@ -160,7 +175,14 @@ class NotificationViewModel @Inject constructor(
                     }
                 )
             } catch (e: Exception) {
-                Log.e("NotificationViewModel", "Error updating notification", e)
+                when (e) {
+                    is kotlinx.coroutines.CancellationException -> {
+                        Log.w("NotificationViewModel", "Notification update operation was cancelled")
+                    }
+                    else -> {
+                        Log.e("NotificationViewModel", "Error updating notification", e)
+                    }
+                }
             }
         }
     }

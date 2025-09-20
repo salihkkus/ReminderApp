@@ -350,3 +350,39 @@ ________________________________________________________________________________
 Navigation Compose, Compose tabanlı uygulamalarda **ekran geçişlerini kolaylaştıran, modern ve sade** bir navigasyon çözümüdür.
 
 __________________________________________________________________________________________________________________________________________________________________________________________
+
+# SHARED PREFERENCES
+
+## Nedir?
+- SharedPreferences, Android’de **küçük verileri kalıcı olarak saklamak** için kullanılan bir yapıdır.  
+- Key-Value (anahtar-değer) mantığıyla çalışır.  
+- Genellikle kullanıcı ayarları, basit konfigürasyonlar veya oturum bilgileri gibi veriler saklanır.  
+
+---
+
+## Ne İşe Yarar?
+- Uygulama kapatılsa bile veriler kaybolmaz.  
+- Kullanıcı tercihlerini (örn: gece modu açık/kapalı), giriş bilgilerini veya küçük flag’leri saklamak için idealdir.  
+- Hafif ve hızlıdır, veritabanı kullanmaya gerek kalmaz.  
+
+---
+
+## Temel Özellikler
+- **Key-Value Store**: Veriler anahtar adıyla kaydedilir ve çağrılır.  
+- **Primitive tipleri destekler**: `String`, `Int`, `Boolean`, `Float`, `Long`.  
+- **Kalıcıdır**: Silinmediği sürece cihazda kalır.  
+- **Kolay Kullanım**: Tek satır kod ile veri yazılıp okunabilir.  
+
+---
+
+## Avantajları
+- Küçük veriler için çok hızlı ve pratik.  
+- Kullanıcı deneyimini geliştirmek için idealdir (ör. dil seçimi, tema modu).  
+- Ekstra yapılandırma gerektirmez.  
+
+---
+
+## Kullanım Senaryoları
+- Kullanıcının giriş yapıp yapmadığını saklamak (`isLoggedIn = true`).  
+- Uygulama temasını hatırlamak (örn: **dark mode** tercihi).  
+- Basit uygulama ayarlarını (örn: bildirim açık/kapalı) depolamak.  

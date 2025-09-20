@@ -6,6 +6,8 @@ import com.example.reminderapp.data.model.ApiNotificationResponse
 import com.example.reminderapp.data.model.ApiNotificationListRequest
 import com.example.reminderapp.data.model.ApiNotificationListResponse
 import com.example.reminderapp.data.model.ApiNotificationData
+import com.example.reminderapp.data.model.AjandaNotRequest
+import com.example.reminderapp.data.model.AjandaNotResponse
 import com.example.reminderapp.receivers.AlarmScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -190,6 +192,48 @@ class NotificationRepository @Inject constructor(
                 Result.success(true)
             } else {
                 Result.failure(Exception(response.message ?: "Güncelleme başarısız"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    // === AJANDA NOT İŞLEMLERİ ===
+    
+    // Ajanda notu ekle
+    suspend fun addAjandaNot(
+        token: String,
+        ajandaId: String,
+        notlar: String
+    ): Result<AjandaNotResponse> {
+        return try {
+            val request = AjandaNotRequest(
+                ajandaId = ajandaId,
+                id = 0, // API otomatik ID atayacak
+                notlar = notlar
+            )
+            val response = apiService.addAjandaNot("Bearer $token", request)
+            if (response.success) {
+                Result.success(response)
+            } else {
+                Result.failure(Exception(response.message ?: "Not eklenemedi"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    // Ajanda notu getir (ID ile)
+    suspend fun getAjandaNotById(
+        token: String,
+        id: Int
+    ): Result<AjandaNotResponse> {
+        return try {
+            val response = apiService.getAjandaNotById("Bearer $token", id)
+            if (response.success) {
+                Result.success(response)
+            } else {
+                Result.failure(Exception(response.message ?: "Not bulunamadı"))
             }
         } catch (e: Exception) {
             Result.failure(e)

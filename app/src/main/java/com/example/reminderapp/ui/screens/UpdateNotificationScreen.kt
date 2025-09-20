@@ -33,6 +33,7 @@ fun UpdateNotificationScreen(
     viewModel: NotificationViewModel = hiltViewModel()
 ) {
     val notifications by viewModel.notifications.collectAsState()
+    val ajandaNot by viewModel.ajandaNot.collectAsState()
     
     // Form state variables
     var firma by remember { mutableStateOf("") }
@@ -43,6 +44,10 @@ fun UpdateNotificationScreen(
     var tarihSaat by remember { mutableStateOf<LocalDateTime?>(null) }
     var kullanici by remember { mutableStateOf("") }
     var tamamlandi by remember { mutableStateOf(false) } // Tamamlanma durumu
+    
+    // Ajanda notları için state
+    var yeniNot by remember { mutableStateOf("") }
+    var showNotSuccessMessage by remember { mutableStateOf(false) }
     
     // Context for dialogs
     val context = LocalContext.current
@@ -76,6 +81,10 @@ fun UpdateNotificationScreen(
             // Tamamlanma durumu
             tamamlandi = n.okundu ?: false
         }
+        
+        // Ajanda notunu yükle - önce ajanda ID'sini kullanarak dene
+        // Eğer bu çalışmazsa, farklı bir yaklaşım gerekebilir
+        viewModel.getAjandaNotById(notificationId)
     }
     
     // Tarih/Saat seçici fonksiyonu
@@ -259,6 +268,121 @@ fun UpdateNotificationScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp)
                         )
+                    }
+                }
+            }
+            
+            // Ajanda Notları Bölümü
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "📝 Ajanda Notları",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    
+                    Text(
+                        text = "Bu ajandaya not ekleyebilirsiniz:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    
+                    // Mevcut notları göster
+                    ajandaNot?.let { not ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp)
+                            ) {
+                                Text(
+                                    text = "📋 Mevcut Not:",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                
+                                Text(
+                                    text = not.notlar ?: "Not bulunamadı",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    } ?: run {
+                        Text(
+                            text = "Bu ajanda için henüz not eklenmemiş.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+                    
+                    Text(
+                        text = "Yeni not eklemek için:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                    
+                    OutlinedTextField(
+                        value = yeniNot,
+                        onValueChange = { yeniNot = it },
+                        label = { Text("Yeni Not") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
+                        maxLines = 5,
+                        supportingText = { Text("Notunuzu buraya yazın") },
+                        placeholder = { Text("Örnek: Müşteri ile görüşme yapıldı, detaylar takip edilecek...") }
+                    )
+                    
+                    Button(
+                        onClick = {
+                            if (yeniNot.isNotBlank()) {
+                                viewModel.addAjandaNot(
+                                    ajandaId = notificationId.toString(),
+                                    notlar = yeniNot.trim()
+                                )
+                                yeniNot = ""
+                                showNotSuccessMessage = true
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = yeniNot.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Text("Not Ekle", style = MaterialTheme.typography.titleMedium)
+                    }
+                    
+                    // Not başarı mesajı
+                    if (showNotSuccessMessage) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            Text(
+                                text = "✅ Not başarıyla eklendi!",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
                     }
                 }
             }

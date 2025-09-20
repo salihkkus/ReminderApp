@@ -22,6 +22,7 @@ class UserPreferences @Inject constructor(
         private const val KEY_KULLANICI_SIFRE = "kullanici_sifre"
         private const val KEY_TOKEN = "token"
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
+        private const val KEY_AJANDA_NOT_ID = "ajanda_not_id_"
     }
 
     // Beni Hatırla durumu
@@ -97,6 +98,22 @@ class UserPreferences @Inject constructor(
             .remove(KEY_KULLANICI_SIFRE)
             .remove(KEY_IS_LOGGED_IN)
             .apply()
+    }
+    
+    // Ajanda not ID'sini kaydet (ajanda ID -> not ID mapping)
+    fun saveAjandaNotId(ajandaId: Int, notId: Int) {
+        prefs.edit().putInt("$KEY_AJANDA_NOT_ID$ajandaId", notId).apply()
+    }
+    
+    // Ajanda not ID'sini al
+    fun getAjandaNotId(ajandaId: Int): Int? {
+        val notId = prefs.getInt("$KEY_AJANDA_NOT_ID$ajandaId", -1)
+        return if (notId == -1) null else notId
+    }
+    
+    // Ajanda not ID'sini sil
+    fun clearAjandaNotId(ajandaId: Int) {
+        prefs.edit().remove("$KEY_AJANDA_NOT_ID$ajandaId").apply()
     }
 }
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,12 +43,27 @@ fun NotificationItem(
                     .weight(1f)
                     .padding(horizontal = 8.dp)
             ) {
-                Text(
-                    text = "Firma: ${notification.firma ?: "Belirtilmemiş"}",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Firma: ${notification.firma ?: "Belirtilmemiş"}",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    
+                    // Tamamlanma durumu göstergesi
+                    if (notification.okundu == true) {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = "Tamamlandı",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
                 
                 Text(
                     text = "Ad Soyad: ${notification.adSoyad ?: "Belirtilmemiş"}",
@@ -124,7 +140,7 @@ fun NotificationItemPreview() {
                 cep = "0532 555 5678",
                 aciklama = "Muhasebe işlemleri için görüşme yapılacak",
                 tarih = "2025-01-15T14:30:00Z",
-                okundu = false,
+                okundu = true,
                 userId = 1,
                 user = "Salih Bey",
                 ajandaDosya = emptyList()

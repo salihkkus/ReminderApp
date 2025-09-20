@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reminderapp.ui.screens.HomeScreen
 import com.example.reminderapp.ui.screens.LoginScreen
 import com.example.reminderapp.ui.screens.AddNotificationScreen
+import com.example.reminderapp.ui.screens.UpdateNotificationScreen
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import com.example.reminderapp.ui.viewmodels.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -163,9 +164,12 @@ fun ReminderApp() {
             composable("add_notification") {
                 AddNotificationScreen(navController = navController)
             }
-            composable("edit_notification/{id}") { backStackEntry ->
+            composable("update_notification/{id}") { backStackEntry ->
                 val idArg = backStackEntry.arguments?.getString("id")
-                AddNotificationScreen(navController = navController, editId = idArg?.toIntOrNull())
+                UpdateNotificationScreen(
+                    navController = navController, 
+                    notificationId = idArg?.toIntOrNull() ?: 0
+                )
             }
         }
     }

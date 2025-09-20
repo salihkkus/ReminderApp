@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.reminderapp.data.local.TokenManager
+import com.example.reminderapp.data.model.ApiNotificationData
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
 import org.threeten.bp.LocalDateTime
@@ -27,10 +27,13 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNotificationScreen(
+fun UpdateNotificationScreen(
     navController: NavController,
+    notificationId: Int,
     viewModel: NotificationViewModel = hiltViewModel()
 ) {
+    val notifications by viewModel.notifications.collectAsState()
+    
     // Form state variables
     var firma by remember { mutableStateOf("") }
     var adSoyad by remember { mutableStateOf("") }
@@ -39,6 +42,7 @@ fun AddNotificationScreen(
     var aciklama by remember { mutableStateOf("") }
     var tarihSaat by remember { mutableStateOf<LocalDateTime?>(null) }
     var kullanici by remember { mutableStateOf("") }
+    var tamamlandi by remember { mutableStateOf(false) } // Tamamlanma durumu
     
     // Context for dialogs
     val context = LocalContext.current
@@ -47,6 +51,32 @@ fun AddNotificationScreen(
     var showSuccessMessage by remember { mutableStateOf(false) }
     var showErrorMessage by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    
+    // Mevcut verileri doldur
+    LaunchedEffect(notificationId, notifications) {
+        val current = notifications.firstOrNull { it.id == notificationId }
+        current?.let { n ->
+            firma = n.firma.orEmpty()
+            adSoyad = n.adSoyad.orEmpty()
+            telefon = n.tel.orEmpty()
+            gsm = n.cep.orEmpty()
+            aciklama = n.aciklama.orEmpty()
+            // API tarih formatı ISO 8601 bekliyor; ekranda gösterim için parse etmeye çalış
+            try {
+                // Basit bir parse: Z içeren ISO tarihleri LocalDateTime'a çevirmek için 'Z' kısmını kaldırıyoruz
+                val iso = n.tarih
+                if (!iso.isNullOrBlank()) {
+                    val cleaned = iso.replace("Z", "")
+                    val parsed = LocalDateTime.parse(cleaned.substring(0, 19))
+                    tarihSaat = parsed
+                }
+            } catch (_: Exception) { /* gösterim için zorunlu değil */ }
+            // Kullanıcı alanı API'den gelmiyor olabilir
+            kullanici = n.user.orEmpty()
+            // Tamamlanma durumu
+            tamamlandi = n.okundu ?: false
+        }
+    }
     
     // Tarih/Saat seçici fonksiyonu
     fun showDateTimePicker(onDateTimeSelected: (LocalDateTime) -> Unit) {
@@ -79,7 +109,7 @@ fun AddNotificationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Yeni Bildirim") },
+                title = { Text("Bildirim Güncelle") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Geri")
@@ -98,7 +128,7 @@ fun AddNotificationScreen(
         ) {
             // Başlık
             Text(
-                text = "Bildirim Bilgileri",
+                text = "Bildirim Bilgilerini Güncelle",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -214,45 +244,69 @@ fun AddNotificationScreen(
                         singleLine = true,
                         supportingText = { Text("Kullanıcı adını girin") }
                     )
+                    
+                    // Tamamlanma durumu
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = tamamlandi,
+                            onCheckedChange = { tamamlandi = it }
+                        )
+                        Text(
+                            text = "İşlem Tamamlandı",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
                 }
             }
             
-                // Kaydet / Güncelle butonu
-                Button(
-                    onClick = {
-                        // Validation
-                        if (firma.isBlank() || adSoyad.isBlank() || telefon.isBlank() || 
-                            gsm.isBlank() || aciklama.isBlank() || kullanici.isBlank() || 
-                            tarihSaat == null) {
-                            showErrorMessage = true
-                            errorMessage = "Lütfen tüm alanları doldurun ve tarih/saat seçin"
-                            return@Button
-                        }
-                        
-                        // Loading state'i göster
-                        showSuccessMessage = false
-                        showErrorMessage = false
-                        
-                        // Yeni ekle
-                        viewModel.addNotification(
-                            firma = firma,
-                            adSoyad = adSoyad,
-                            telefon = telefon,
-                            gsm = gsm,
+            // Güncelle butonu
+            Button(
+                onClick = {
+                    // Validation
+                    if (firma.isBlank() || adSoyad.isBlank() || telefon.isBlank() || 
+                        gsm.isBlank() || aciklama.isBlank() || kullanici.isBlank() || 
+                        tarihSaat == null) {
+                        showErrorMessage = true
+                        errorMessage = "Lütfen tüm alanları doldurun ve tarih/saat seçin"
+                        return@Button
+                    }
+                    
+                    // Loading state'i göster
+                    showSuccessMessage = false
+                    showErrorMessage = false
+                    
+                    // Güncelle
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    val formattedDate = tarihSaat!!.format(formatter)
+                    viewModel.updateNotification(
+                        notification = ApiNotificationData(
+                            id = notificationId,
                             aciklama = aciklama,
-                            tarihSaat = tarihSaat!!, // Null check yapıldığı için güvenli
-                            kullanici = kullanici
+                            adSoyad = adSoyad,
+                            cep = gsm,
+                            firma = firma,
+                            okundu = tamamlandi,
+                            tarih = formattedDate,
+                            tel = telefon,
+                            userId = null,
+                            user = kullanici,
+                            ajandaDosya = emptyList()
                         )
-                        
-                        showSuccessMessage = true
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
                     )
-                ) {
-                    Text("Kaydet", style = MaterialTheme.typography.titleMedium)
-                }
+                    
+                    showSuccessMessage = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text("Güncelle", style = MaterialTheme.typography.titleMedium)
+            }
             
             // Başarı mesajı
             if (showSuccessMessage) {
@@ -266,12 +320,12 @@ fun AddNotificationScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "✅ Bildirim Başarıyla Kaydedildi!",
+                            text = "✅ Bildirim Başarıyla Güncellendi!",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = "Alarm kuruldu ve bildirim zamanında gelecek",
+                            text = "Değişiklikler kaydedildi",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(top = 4.dp)
@@ -327,8 +381,11 @@ fun AddNotificationScreen(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun AddNotificationScreenPreview() {
+fun UpdateNotificationScreenPreview() {
     ReminderappTheme {
-        AddNotificationScreen(navController = rememberNavController())
+        UpdateNotificationScreen(
+            navController = rememberNavController(),
+            notificationId = 1
+        )
     }
 }

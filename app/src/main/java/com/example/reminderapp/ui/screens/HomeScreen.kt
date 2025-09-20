@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.reminderapp.data.model.Priority
 import com.example.reminderapp.data.model.Reminder
-import com.example.reminderapp.data.model.ApiNotificationData
 import com.example.reminderapp.ui.components.ReminderItem
 import com.example.reminderapp.ui.components.NotificationItem
 import com.example.reminderapp.ui.theme.ReminderappTheme
@@ -77,7 +76,7 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = 30.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -87,7 +86,12 @@ fun HomeScreen(
                     )
                 }
                 CenterAlignedTopAppBar(
-                    title = { Text("Ajanda Modülü") },
+                    title = {
+                        Text(
+                            text = "Ajanda Modülü",
+                            fontSize = 30.sp, // istediğin büyüklüğü buradan ayarlayabilirsin
+                        )
+                    },
                     actions = {
                         IconButton(
                             onClick = {
@@ -457,7 +461,7 @@ fun HomeScreen(
                             NotificationItem(
                                 notification = notification,
                                 onDelete = { notificationViewModel.deleteNotification(notification) },
-                                onEdit = { navController.navigate("edit_notification/${notification.id}") }
+                                onEdit = { navController.navigate("update_notification/${notification.id}") }
                             )
                         }
                         

@@ -78,7 +78,8 @@ class NotificationViewModel @Inject constructor(
         gsm: String,
         aciklama: String,
         tarihSaat: LocalDateTime,
-        kullanici: String
+        kullanici: String,
+        tamamlandi: Boolean = false
     ) {
         val token = tokenManager.getToken()
         if (token.isNullOrBlank()) {
@@ -96,7 +97,8 @@ class NotificationViewModel @Inject constructor(
                     gsm = gsm.trim(),
                     aciklama = aciklama.trim(),
                     tarihSaat = tarihSaat,
-                    kullanici = kullanici.trim()
+                    kullanici = kullanici.trim(),
+                    tamamlandi = tamamlandi
                 )
                 
                 result.fold(

@@ -82,7 +82,8 @@ class NotificationRepository @Inject constructor(
         gsm: String,
         aciklama: String,
         tarihSaat: LocalDateTime,
-        kullanici: String
+        kullanici: String,
+        tamamlandi: Boolean = false
     ): Result<ApiNotificationResponse> {
         return try {
             // Tarih formatını ISO 8601'e çevir
@@ -95,7 +96,7 @@ class NotificationRepository @Inject constructor(
                 cep = gsm,
                 firma = firma,
                 id = 0, // API otomatik ID atayacak
-                okundu = false,
+                okundu = tamamlandi,
                 tarih = formattedDate,
                 tel = telefon,
                 userId = null // Şimdilik null, gerekirse token'dan çıkarılabilir
@@ -122,9 +123,10 @@ class NotificationRepository @Inject constructor(
         gsm: String,
         aciklama: String,
         tarihSaat: LocalDateTime,
-        kullanici: String
+        kullanici: String,
+        tamamlandi: Boolean = false
     ): Result<ApiNotificationResponse> {
-        val result = addNotification(token, firma, adSoyad, telefon, gsm, aciklama, tarihSaat, kullanici)
+        val result = addNotification(token, firma, adSoyad, telefon, gsm, aciklama, tarihSaat, kullanici, tamamlandi)
         
         result.fold(
             onSuccess = { response ->

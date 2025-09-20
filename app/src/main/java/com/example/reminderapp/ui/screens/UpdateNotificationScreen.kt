@@ -48,6 +48,9 @@ fun UpdateNotificationScreen(
     // Ajanda notları için state
     var yeniNot by remember { mutableStateOf("") }
     var showNotSuccessMessage by remember { mutableStateOf(false) }
+    var showNotEditDialog by remember { mutableStateOf(false) }
+    var showNotDeleteDialog by remember { mutableStateOf(false) }
+    var editNotText by remember { mutableStateOf("") }
     
     // Context for dialogs
     val context = LocalContext.current
@@ -307,17 +310,61 @@ fun UpdateNotificationScreen(
                             Column(
                                 modifier = Modifier.padding(12.dp)
                             ) {
-                                Text(
-                                    text = "📋 Mevcut Not:",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "📋 Mevcut Not:",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        // Güncelle butonu
+                                        Button(
+                                            onClick = {
+                                                editNotText = not.notlar ?: ""
+                                                showNotEditDialog = true
+                                            },
+                                            modifier = Modifier.height(32.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "✏️",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
+                                        
+                                        // Sil butonu
+                                        Button(
+                                            onClick = {
+                                                showNotDeleteDialog = true
+                                            },
+                                            modifier = Modifier.height(32.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.error
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "🗑️",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
+                                    }
+                                }
                                 
                                 Text(
                                     text = not.notlar ?: "Not bulunamadı",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(top = 8.dp)
                                 )
                             }
                         }
@@ -500,6 +547,81 @@ fun UpdateNotificationScreen(
                 }
             }
         }
+    }
+    
+    // Not güncelleme dialog'u
+    if (showNotEditDialog) {
+        AlertDialog(
+            onDismissRequest = { showNotEditDialog = false },
+            title = { Text("Notu Güncelle") },
+            text = {
+                OutlinedTextField(
+                    value = editNotText,
+                    onValueChange = { editNotText = it },
+                    label = { Text("Not") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    maxLines = 5
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        ajandaNot?.let { not ->
+                            viewModel.updateAjandaNot(
+                                notId = not.id,
+                                ajandaId = notificationId.toString(),
+                                notlar = editNotText.trim()
+                            )
+                            showNotEditDialog = false
+                            showNotSuccessMessage = true
+                        }
+                    },
+                    enabled = editNotText.isNotBlank()
+                ) {
+                    Text("Güncelle")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNotEditDialog = false }) {
+                    Text("İptal")
+                }
+            }
+        )
+    }
+    
+    // Not silme dialog'u
+    if (showNotDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showNotDeleteDialog = false },
+            title = { Text("Notu Sil") },
+            text = { Text("Bu notu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        ajandaNot?.let { not ->
+                            viewModel.deleteAjandaNot(
+                                notId = not.id,
+                                ajandaId = notificationId.toString(),
+                                notlar = not.notlar ?: ""
+                            )
+                            showNotDeleteDialog = false
+                            showNotSuccessMessage = true
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Sil")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNotDeleteDialog = false }) {
+                    Text("İptal")
+                }
+            }
+        )
     }
 }
 

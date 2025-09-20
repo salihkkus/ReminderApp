@@ -239,4 +239,52 @@ class NotificationRepository @Inject constructor(
             Result.failure(e)
         }
     }
+    
+    // Ajanda notu güncelle
+    suspend fun updateAjandaNot(
+        token: String,
+        notId: Int,
+        ajandaId: String,
+        notlar: String
+    ): Result<AjandaNotResponse> {
+        return try {
+            val request = AjandaNotRequest(
+                ajandaId = ajandaId,
+                id = notId,
+                notlar = notlar
+            )
+            val response = apiService.updateAjandaNot("Bearer $token", request)
+            if (response.success) {
+                Result.success(response)
+            } else {
+                Result.failure(Exception(response.message ?: "Not güncellenemedi"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    // Ajanda notu sil
+    suspend fun deleteAjandaNot(
+        token: String,
+        notId: Int,
+        ajandaId: String,
+        notlar: String
+    ): Result<AjandaNotResponse> {
+        return try {
+            val request = AjandaNotRequest(
+                ajandaId = ajandaId,
+                id = notId,
+                notlar = notlar
+            )
+            val response = apiService.deleteAjandaNot("Bearer $token", request)
+            if (response.success) {
+                Result.success(response)
+            } else {
+                Result.failure(Exception(response.message ?: "Not silinemedi"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

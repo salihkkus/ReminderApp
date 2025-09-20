@@ -58,4 +58,16 @@ interface BilsoftApiService {
         @Header("Authorization") token: String,
         @Query("id") id: Int
     ): AjandaNotResponse
+    
+    @PUT("AjandaNotlar/update")
+    suspend fun updateAjandaNot(
+        @Header("Authorization") token: String,
+        @Body request: AjandaNotRequest
+    ): AjandaNotResponse
+    
+    @POST("AjandaNotlar/delete")
+    suspend fun deleteAjandaNot(
+        @Header("Authorization") token: String,
+        @Body request: AjandaNotRequest
+    ): AjandaNotResponse
 }

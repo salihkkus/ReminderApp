@@ -288,4 +288,81 @@ class NotificationViewModel @Inject constructor(
             }
         }
     }
+    
+    // Ajanda notu güncelle
+    fun updateAjandaNot(notId: Int, ajandaId: String, notlar: String) {
+        val token = tokenManager.getToken()
+        if (token.isNullOrBlank()) {
+            Log.e("NotificationViewModel", "Token not found! User must be logged in.")
+            return
+        }
+        
+        viewModelScope.launch {
+            try {
+                val result = repository.updateAjandaNot(
+                    token = "Bearer $token",
+                    notId = notId,
+                    ajandaId = ajandaId,
+                    notlar = notlar
+                )
+                
+                result.fold(
+                    onSuccess = { response ->
+                        Log.d("NotificationViewModel", "Ajanda not updated successfully: ${response.message}")
+                        // Güncellenmiş notu state'e kaydet
+                        if (response.data != null) {
+                            _ajandaNot.value = response.data
+                            Log.d("NotificationViewModel", "Not updated in state with ID: ${response.data.id}")
+                        }
+                    },
+                    onFailure = { error ->
+                        Log.e("NotificationViewModel", "Error updating ajanda not", error)
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e("NotificationViewModel", "Error updating ajanda not", e)
+            }
+        }
+    }
+    
+    // Ajanda notu sil
+    fun deleteAjandaNot(notId: Int, ajandaId: String, notlar: String) {
+        val token = tokenManager.getToken()
+        if (token.isNullOrBlank()) {
+            Log.e("NotificationViewModel", "Token not found! User must be logged in.")
+            return
+        }
+        
+        viewModelScope.launch {
+            try {
+                val result = repository.deleteAjandaNot(
+                    token = "Bearer $token",
+                    notId = notId,
+                    ajandaId = ajandaId,
+                    notlar = notlar
+                )
+                
+                result.fold(
+                    onSuccess = { response ->
+                        Log.d("NotificationViewModel", "Ajanda not deleted successfully: ${response.message}")
+                        // State'i temizle
+                        _ajandaNot.value = null
+                        _currentNotId.value = null
+                        
+                        // SharedPreferences'ten de sil
+                        val ajandaIdInt = ajandaId.toIntOrNull()
+                        if (ajandaIdInt != null) {
+                            userPreferences.clearAjandaNotId(ajandaIdInt)
+                            Log.d("NotificationViewModel", "Not ID cleared for ajanda ID $ajandaIdInt")
+                        }
+                    },
+                    onFailure = { error ->
+                        Log.e("NotificationViewModel", "Error deleting ajanda not", error)
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e("NotificationViewModel", "Error deleting ajanda not", e)
+            }
+        }
+    }
 }

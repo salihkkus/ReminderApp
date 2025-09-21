@@ -45,6 +45,7 @@ class NotificationViewModel @Inject constructor(
     val error: StateFlow<String?> = _error.asStateFlow()
     
     init {
+        // Load initial data
         loadNotifications()
     }
     
@@ -245,6 +246,15 @@ class NotificationViewModel @Inject constructor(
         }
     }
     
+    // === ÖNCELİK (YILDIZ) ===
+    private val _priorityIds = MutableStateFlow(userPreferences.getPrioritizedIds())
+    val priorityIds: StateFlow<Set<Int>> = _priorityIds.asStateFlow()
+
+    fun togglePriority(notificationId: Int) {
+        val updated = userPreferences.togglePriority(notificationId)
+        _priorityIds.value = updated
+    }
+
     // Ajanda notu getir (ID ile)
     fun getAjandaNotById(ajandaId: Int) {
         val token = tokenManager.getToken()

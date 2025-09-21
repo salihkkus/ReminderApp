@@ -5,6 +5,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Star
+// removed outlined star import to avoid unresolved symbol on older compose versions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +25,8 @@ fun NotificationItem(
     notification: ApiNotificationData,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
+    isPrioritized: Boolean = false,
+    onTogglePriority: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
@@ -107,6 +111,14 @@ fun NotificationItem(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // Öncelik (yıldız) butonu
+                IconButton(onClick = onTogglePriority) {
+                    Icon(
+                        Icons.Filled.Star,
+                        contentDescription = if (isPrioritized) "Öncelikli" else "Öncelik ver",
+                        tint = if (isPrioritized) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                    )
+                }
                 IconButton(onClick = onEdit) {
                     Icon(
                         Icons.Default.Edit,

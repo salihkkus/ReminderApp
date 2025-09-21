@@ -179,7 +179,8 @@ class LoginViewModel @Inject constructor(
     // Çıkış yap
     fun logout() {
         Log.d("LoginViewModel", "Logging out user")
-        userPreferences.clearAll()
+        // Öncelik yıldızlarını koruyarak diğer bilgileri temizle
+        userPreferences.clearAllPreservePriority()
         tokenManager.clearToken()
         _loginState.value = LoginState()
     }

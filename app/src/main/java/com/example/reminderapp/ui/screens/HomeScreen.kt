@@ -41,6 +41,7 @@ fun HomeScreen(
 ) {
     val reminders by homeViewModel.reminders.collectAsState()
     val notifications by notificationViewModel.notifications.collectAsState()
+    val priorityIds by notificationViewModel.priorityIds.collectAsState()
     val isLoading by notificationViewModel.isLoading.collectAsState()
     val error by notificationViewModel.error.collectAsState()
     
@@ -195,7 +196,11 @@ fun HomeScreen(
             var endDateText by remember { mutableStateOf("") }
             var selectedUser by remember { mutableStateOf<String?>(null) }
             var statusFilter by remember { mutableStateOf(0) } // 0: Tümü, 1: Tamamlanan (okundu=true), 2: Tamamlanmayan (okundu=false)
-            var filteredNotifications by remember(notifications) { mutableStateOf(notifications) }
+            var filteredNotifications by remember(notifications, priorityIds) {
+                mutableStateOf(
+                    notifications.sortedByDescending { priorityIds.contains(it.id) }
+                )
+            }
 
             // Kullanıcı listesi (mevcut bildirimlerden)
             val userOptions = remember(notifications) {
@@ -365,7 +370,8 @@ fun HomeScreen(
                                     else -> result
                                 }
 
-                                filteredNotifications = result
+                                // Öncelikliler üste gelecek şekilde sırala
+                                filteredNotifications = result.sortedByDescending { priorityIds.contains(it.id) }
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -461,7 +467,9 @@ fun HomeScreen(
                             NotificationItem(
                                 notification = notification,
                                 onDelete = { notificationViewModel.deleteNotification(notification) },
-                                onEdit = { navController.navigate("update_notification/${notification.id}") }
+                                onEdit = { navController.navigate("update_notification/${notification.id}") },
+                                isPrioritized = priorityIds.contains(notification.id),
+                                onTogglePriority = { notificationViewModel.togglePriority(notification.id) }
                             )
                         }
                         

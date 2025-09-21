@@ -23,6 +23,7 @@ class UserPreferences @Inject constructor(
         private const val KEY_TOKEN = "token"
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
         private const val KEY_AJANDA_NOT_ID = "ajanda_not_id_"
+        private const val KEY_PRIORITY_IDS = "priority_ids"
     }
 
     // Beni Hatırla durumu
@@ -90,6 +91,16 @@ class UserPreferences @Inject constructor(
         prefs.edit().clear().apply()
     }
 
+    // Tüm verileri temizle ama öncelik listelerini koru
+    fun clearAllPreservePriority() {
+        val priority = prefs.getStringSet(KEY_PRIORITY_IDS, emptySet()) ?: emptySet()
+        val editor = prefs.edit()
+        editor.clear()
+        editor.apply()
+        // clear() tüm verileri sildiği için öncelik setini geri yaz
+        prefs.edit().putStringSet(KEY_PRIORITY_IDS, priority).apply()
+    }
+
     // Sadece giriş bilgilerini temizle (token'ı koru)
     fun clearCredentials() {
         prefs.edit()
@@ -114,6 +125,24 @@ class UserPreferences @Inject constructor(
     // Ajanda not ID'sini sil
     fun clearAjandaNotId(ajandaId: Int) {
         prefs.edit().remove("$KEY_AJANDA_NOT_ID$ajandaId").apply()
+    }
+
+    // === Önceliklendirme (yıldız) ===
+    fun getPrioritizedIds(): Set<Int> {
+        val stored = prefs.getStringSet(KEY_PRIORITY_IDS, emptySet()) ?: emptySet()
+        return stored.mapNotNull { it.toIntOrNull() }.toSet()
+    }
+
+    fun isPrioritized(id: Int): Boolean {
+        return getPrioritizedIds().contains(id)
+    }
+
+    fun togglePriority(id: Int): Set<Int> {
+        val current = getPrioritizedIds().toMutableSet()
+        if (current.contains(id)) current.remove(id) else current.add(id)
+        val asStrings = current.map { it.toString() }.toSet()
+        prefs.edit().putStringSet(KEY_PRIORITY_IDS, asStrings).apply()
+        return current
     }
 }
 

@@ -179,48 +179,7 @@ fun LoginScreen(
             }
         }
         
-        // Test login butonu (development için)
-        OutlinedButton(
-            onClick = { viewModel.testLogin() },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !loginState.isLoading
-        ) {
-            Text("🧪 Test Giriş (API olmadan)")
-        }
         
-        // Debug bilgileri (sadece development'ta göster)
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "🔧 Debug Bilgileri",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "API Endpoint: https://apiv3.bilsoft.com/api/Auth/GirisYap",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-                Text(
-                    text = "Vergi No: $vergiNumarasi",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "Kullanıcı: $kullaniciAdi",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
         
         // Error display with more details
         loginState.error?.let { errorMsg ->

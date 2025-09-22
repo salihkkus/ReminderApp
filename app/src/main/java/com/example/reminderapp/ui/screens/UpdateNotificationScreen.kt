@@ -7,6 +7,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Edit
+// Removed calendar/work icons due to availability issues in current icon set
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -161,6 +165,7 @@ fun UpdateNotificationScreen(
                         label = { Text("Firma") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                         supportingText = { Text("Firma adını girin") }
                     )
                     
@@ -171,6 +176,7 @@ fun UpdateNotificationScreen(
                         label = { Text("Ad Soyad") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         supportingText = { Text("Ad ve soyadını girin") }
                     )
                     
@@ -182,6 +188,7 @@ fun UpdateNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
                         supportingText = { Text("Telefon numarasını girin") }
                     )
                     
@@ -193,6 +200,7 @@ fun UpdateNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
                         supportingText = { Text("GSM numarasını girin") }
                     )
                     
@@ -204,6 +212,7 @@ fun UpdateNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
                         maxLines = 5,
+                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                         supportingText = { Text("Bildirim açıklamasını girin") }
                     )
                     
@@ -220,30 +229,39 @@ fun UpdateNotificationScreen(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = "Tarih ve Saat",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = tarihSaat?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
-                                    ?: "Tarih ve saat seçiniz",
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(top = 8.dp),
-                                color = if (tarihSaat == null) 
-                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                                else 
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = "Tıklayarak tarih ve saat seçebilirsiniz",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Tarih ve Saat",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = tarihSaat?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
+                                        ?: "Tarih ve saat seçiniz",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    color = if (tarihSaat == null) 
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    else 
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "Tıklayarak tarih ve saat seçebilirsiniz",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+                            // Icon removed to avoid unresolved reference in current icon set
                         }
                     }
                     
@@ -254,6 +272,7 @@ fun UpdateNotificationScreen(
                         label = { Text("Kullanıcı") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         supportingText = { Text("Kullanıcı adını girin") }
                     )
                     
@@ -391,6 +410,7 @@ fun UpdateNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
                         maxLines = 5,
+                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                         supportingText = { Text("Notunuzu buraya yazın") },
                         placeholder = { Text("Örnek: Müşteri ile görüşme yapıldı, detaylar takip edilecek...") }
                     )

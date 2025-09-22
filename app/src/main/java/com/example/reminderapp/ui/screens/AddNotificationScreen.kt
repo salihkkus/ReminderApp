@@ -7,6 +7,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -119,6 +122,7 @@ fun AddNotificationScreen(
                         label = { Text("Firma") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                         supportingText = { Text("Firma adını girin") }
                     )
                     
@@ -129,6 +133,7 @@ fun AddNotificationScreen(
                         label = { Text("Ad Soyad") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         supportingText = { Text("Ad ve soyadını girin") }
                     )
                     
@@ -140,6 +145,7 @@ fun AddNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
                         supportingText = { Text("Telefon numarasını girin") }
                     )
                     
@@ -151,6 +157,7 @@ fun AddNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
                         supportingText = { Text("GSM numarasını girin") }
                     )
                     
@@ -162,6 +169,7 @@ fun AddNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
                         maxLines = 5,
+                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                         supportingText = { Text("Bildirim açıklamasını girin") }
                     )
                     
@@ -212,6 +220,7 @@ fun AddNotificationScreen(
                         label = { Text("Kullanıcı") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         supportingText = { Text("Kullanıcı adını girin") }
                     )
                 }

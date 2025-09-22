@@ -9,6 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -112,6 +116,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
+                    leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                     supportingText = { Text("Örnek: 0123456010") }
                 )
                 
@@ -122,6 +127,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                     supportingText = { Text("E-posta adresiniz") }
                 )
                 
@@ -133,6 +139,7 @@ fun LoginScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
                     supportingText = { Text("Şifrenizi girin") }
                 )
                 

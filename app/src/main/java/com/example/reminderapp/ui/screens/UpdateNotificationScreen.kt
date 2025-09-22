@@ -216,53 +216,26 @@ fun UpdateNotificationScreen(
                         supportingText = { Text("Bildirim açıklamasını girin") }
                     )
                     
-                    // Tarih Saat - Tıklanabilir seçici
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                showDateTimePicker { selectedDateTime ->
-                                    tarihSaat = selectedDateTime
-                                }
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    // Tarih Saat - Outlined kutu içinde tıklanabilir alan
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = tarihSaat?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) ?: "",
+                            onValueChange = { },
+                            readOnly = true,
+                            label = { Text("Tarih ve Saat") },
+                            placeholder = { Text("Tarih ve saat seçiniz") },
+                            supportingText = { Text("Tıklayarak tarih ve saat seçebilirsiniz") },
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    ) {
-                        Row(
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = "Tarih ve Saat",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = tarihSaat?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
-                                        ?: "Tarih ve saat seçiniz",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.padding(top = 8.dp),
-                                    color = if (tarihSaat == null) 
-                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                                    else 
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "Tıklayarak tarih ve saat seçebilirsiniz",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                    modifier = Modifier.padding(top = 4.dp)
-                                )
-                            }
-                            // Icon removed to avoid unresolved reference in current icon set
-                        }
+                                .matchParentSize()
+                                .clickable {
+                                    showDateTimePicker { selectedDateTime ->
+                                        tarihSaat = selectedDateTime
+                                    }
+                                }
+                        )
                     }
                     
                     // Kullanıcı

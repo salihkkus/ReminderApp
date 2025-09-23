@@ -131,25 +131,9 @@ fun HomeScreen(
                     }
                 }
 
-                Button(
-                    onClick = { navController.navigate("calendar") },
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("Takvim")
-                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            // Geniş ekranda da her zaman görünsün diye tam genişlik Takvim butonu
-            Button(
-                onClick = { navController.navigate("calendar") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Text("Takvim")
-            }
             
             // Filtre durumları (bildirimler için)
             var nameQuery by remember { mutableStateOf("") }
@@ -416,12 +400,25 @@ fun HomeScreen(
                     // Bildirimler bölümü
                     if (filteredNotifications.isNotEmpty()) {
                         item {
-                            Text(
-                                text = "📢 Bildirimler (${filteredNotifications.size})",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "📢 Bildirimler (${filteredNotifications.size})",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                TextButton(onClick = { navController.navigate("calendar") }) {
+                                    Text(
+                                        text = "Takvim",
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                }
+                            }
                         }
                         
                         items(filteredNotifications) { notification ->

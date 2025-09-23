@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -30,7 +29,7 @@ import com.example.reminderapp.ui.viewmodels.HomeViewModel
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
 import com.example.reminderapp.ui.viewmodels.LoginViewModel
 import org.threeten.bp.LocalDateTime
-import kotlinx.coroutines.delay
+ 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,31 +45,7 @@ fun HomeScreen(
     val isLoading by notificationViewModel.isLoading.collectAsState()
     val error by notificationViewModel.error.collectAsState()
     
-    // Başarı mesajı için state - sadece manuel giriş için göster
-    var showSuccessMessage by remember { mutableStateOf(false) }
-    var isAutoLogin by remember { mutableStateOf(true) }
     
-    // İlk yüklemede otomatik giriş kontrolü
-    LaunchedEffect(Unit) {
-        val savedCredentials = loginViewModel.getSavedCredentials()
-        val rememberMe = loginViewModel.getRememberMe()
-        
-        if (savedCredentials != null && rememberMe) {
-            isAutoLogin = true
-            showSuccessMessage = false
-        } else {
-            isAutoLogin = false
-            showSuccessMessage = true
-        }
-    }
-    
-    // Başarı mesajını 3 saniye sonra otomatik gizle (sadece manuel giriş için)
-    LaunchedEffect(showSuccessMessage) {
-        if (showSuccessMessage && !isAutoLogin) {
-            delay(1700)
-            showSuccessMessage = false
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -119,51 +94,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Başarı mesajı (sadece manuel giriş için)
-            if (showSuccessMessage && !isAutoLogin) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.CheckCircle,
-                                contentDescription = "Başarılı",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                            Text(
-                                text = "✅ Giriş başarılı! Hoş geldiniz",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                        
-                        IconButton(
-                            onClick = { showSuccessMessage = false }
-                        ) {
-                            Text(
-                                text = "✕",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                    }
-                }
-            }
+            
             
             // Butonlar
             Row(
@@ -199,6 +130,25 @@ fun HomeScreen(
                         Text("Yenile", style = MaterialTheme.typography.titleMedium)
                     }
                 }
+
+                Button(
+                    onClick = { navController.navigate("calendar") },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Takvim")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Geniş ekranda da her zaman görünsün diye tam genişlik Takvim butonu
+            Button(
+                onClick = { navController.navigate("calendar") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text("Takvim")
             }
             
             // Filtre durumları (bildirimler için)
@@ -566,8 +516,7 @@ private fun HomeScreenWithData(
     navController: NavController,
     reminders: List<Reminder>
 ) {
-    var showSuccessMessage by remember { mutableStateOf(true) }
-    var isAutoLogin by remember { mutableStateOf(false) } // Preview için false
+    
     
     Scaffold(
         topBar = {
@@ -593,51 +542,7 @@ private fun HomeScreenWithData(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Başarı mesajı (sadece manuel giriş için)
-            if (showSuccessMessage && !isAutoLogin) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.CheckCircle,
-                                contentDescription = "Başarılı",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                            Text(
-                                text = "✅ Giriş başarılı! Hoş geldiniz",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                        
-                        IconButton(
-                            onClick = { showSuccessMessage = false }
-                        ) {
-                            Text(
-                                text = "✕",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                    }
-                }
-            }
+            
             
             LazyColumn(
                 modifier = Modifier

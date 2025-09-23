@@ -30,6 +30,5 @@ class ReminderRepository @Inject constructor(
     
     suspend fun updateCompletionStatus(id: Long, isCompleted: Boolean) =
         reminderDao.updateCompletionStatus(id, isCompleted)
-    
-    // Resmi olmayan API operasyonları kaldırıldı; Room üzerinden çalışıyoruz
+
 }

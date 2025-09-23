@@ -15,10 +15,7 @@ interface BilsoftApiService {
     @POST("Auth/GirisYap")
     suspend fun login(@Body loginRequest: LoginRequest): LoginResponse
     
-    // Resmi olmayan Reminder endpointleri kaldırıldı
-    
-    // removed unused completeReminder endpoint
-    
+
     // === BİLDİRİM İŞLEMLERİ ===
     
     @POST("Ajanda/add")

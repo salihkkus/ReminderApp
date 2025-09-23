@@ -161,6 +161,9 @@ fun ReminderApp() {
             composable("home") {
                 HomeScreen(navController = navController)
             }
+            composable("calendar") {
+                com.example.reminderapp.ui.screens.CalendarScreen(navController = navController)
+            }
             composable("add_notification") {
                 AddNotificationScreen(navController = navController)
             }

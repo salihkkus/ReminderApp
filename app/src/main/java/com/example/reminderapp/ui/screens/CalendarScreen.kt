@@ -37,6 +37,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.reminderapp.ui.viewmodels.CalendarViewModel
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
+import com.example.reminderapp.ui.viewmodels.HomeViewModel
+import com.example.reminderapp.ui.components.ReminderItem
+import com.example.reminderapp.ui.components.NotificationItem
 import androidx.compose.material3.CardDefaults
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
@@ -48,7 +51,8 @@ import java.util.Locale
 fun CalendarScreen(
     navController: NavController,
     viewModel: CalendarViewModel = hiltViewModel(),
-    notificationViewModel: NotificationViewModel = hiltViewModel()
+    notificationViewModel: NotificationViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val currentMonth by viewModel.currentMonth.collectAsState()
     val reminders by viewModel.remindersForMonth.collectAsState()
@@ -202,19 +206,13 @@ fun CalendarScreen(
                                 color = MaterialTheme.colorScheme.primary
                             )
                             dayReminders.forEach { r ->
-                                androidx.compose.material3.Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors()
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(text = r.title, style = MaterialTheme.typography.titleSmall)
-                                        val timeText = r.dateTime.toLocalTime().toString()
-                                        Text(text = timeText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        r.description?.takeIf { it.isNotBlank() }?.let {
-                                            Text(text = it, style = MaterialTheme.typography.bodySmall)
-                                        }
-                                    }
-                                }
+                                ReminderItem(
+                                    reminder = r,
+                                    onToggleComplete = { homeViewModel.toggleReminderComplete(r.id) },
+                                    onDelete = { homeViewModel.deleteReminder(r) },
+                                    onEdit = { /* isteğe bağlı: düzenleme ekranına git */ },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
                         }
 
@@ -225,25 +223,14 @@ fun CalendarScreen(
                                 color = MaterialTheme.colorScheme.primary
                             )
                             dayNotifications.forEach { n ->
-                                val dt = n.tarih?.let {
-                                    try {
-                                        val cleaned = it.replace("Z", "")
-                                        org.threeten.bp.LocalDateTime.parse(cleaned.substring(0, 19))
-                                    } catch (e: Exception) { null }
-                                }
-                                val timeText = dt?.toLocalTime()?.toString() ?: "--:--"
-                                androidx.compose.material3.Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors()
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(text = (n.adSoyad ?: n.firma ?: "Bildirim"), style = MaterialTheme.typography.titleSmall)
-                                        Text(text = timeText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        n.aciklama?.takeIf { it.isNotBlank() }?.let {
-                                            Text(text = it, style = MaterialTheme.typography.bodySmall)
-                                        }
-                                    }
-                                }
+                                NotificationItem(
+                                    notification = n,
+                                    onDelete = { notificationViewModel.deleteNotification(n) },
+                                    onEdit = { navController.navigate("update_notification/${n.id}") },
+                                    isPrioritized = notificationViewModel.priorityIds.collectAsState().value.contains(n.id),
+                                    onTogglePriority = { notificationViewModel.togglePriority(n.id) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
                         }
                     }

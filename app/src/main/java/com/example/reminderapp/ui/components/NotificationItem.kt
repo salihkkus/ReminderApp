@@ -70,7 +70,7 @@ fun NotificationItem(
                 
                 Text(
                     text = "Ad Soyad: ${notification.adSoyad ?: "Belirtilmemiş"}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -79,7 +79,7 @@ fun NotificationItem(
                 
                 Text(
                     text = "Tel: ${notification.tel ?: "Belirtilmemiş"} | GSM: ${notification.cep ?: "Belirtilmemiş"}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -89,7 +89,7 @@ fun NotificationItem(
                 if (!notification.aciklama.isNullOrBlank()) {
                     Text(
                         text = "Açıklama: ${notification.aciklama}",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -99,7 +99,7 @@ fun NotificationItem(
                 
                 Text(
                     text = "Tarih: ${notification.tarih ?: "Belirtilmemiş"}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
                 )

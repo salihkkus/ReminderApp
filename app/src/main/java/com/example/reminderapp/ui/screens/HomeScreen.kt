@@ -25,6 +25,8 @@ import com.example.reminderapp.data.model.Reminder
 import com.example.reminderapp.ui.components.ReminderItem
 import com.example.reminderapp.ui.components.NotificationItem
 import com.example.reminderapp.ui.theme.ReminderappTheme
+import com.example.reminderapp.ui.theme.CustomBlue
+import com.example.reminderapp.ui.theme.CustomOrange
 import com.example.reminderapp.ui.viewmodels.HomeViewModel
 import com.example.reminderapp.ui.viewmodels.NotificationViewModel
 import com.example.reminderapp.ui.viewmodels.LoginViewModel
@@ -81,7 +83,7 @@ fun HomeScreen(
                             Icon(
                                 Icons.Default.ExitToApp,
                                 contentDescription = "Çıkış Yap",
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -107,7 +109,7 @@ fun HomeScreen(
                     onClick = { navController.navigate("add_notification") },
                     modifier = Modifier.width(180.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = CustomOrange
                     )
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -121,7 +123,7 @@ fun HomeScreen(
                     onClick = { notificationViewModel.loadNotifications() },
                     modifier = Modifier.width(180.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary
+                        containerColor = CustomBlue
                     )
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -318,7 +320,10 @@ fun HomeScreen(
                                 // Öncelikliler üste gelecek şekilde sırala
                                 filteredNotifications = result.sortedByDescending { priorityIds.contains(it.id) }
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = CustomBlue
+                            )
                         ) {
                             Text("Ara")
                         }

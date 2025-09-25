@@ -128,7 +128,7 @@ fun UpdateNotificationScreen(
                 title = { Text("Bildirim Güncelle") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Geri")
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Geri", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             )
@@ -165,7 +165,7 @@ fun UpdateNotificationScreen(
                         label = { Text("Firma") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                         supportingText = { Text("Firma adını girin") }
                     )
                     
@@ -176,7 +176,7 @@ fun UpdateNotificationScreen(
                         label = { Text("Ad Soyad") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                         supportingText = { Text("Ad ve soyadını girin") }
                     )
                     
@@ -188,7 +188,7 @@ fun UpdateNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
-                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                         supportingText = { Text("Telefon numarasını girin") }
                     )
                     
@@ -200,7 +200,7 @@ fun UpdateNotificationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
-                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                         supportingText = { Text("GSM numarasını girin") }
                     )
                     

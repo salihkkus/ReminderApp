@@ -116,7 +116,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
-                    leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                    leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     supportingText = { Text("Örnek: 0123456010") }
                 )
                 
@@ -127,7 +127,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
-                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     supportingText = { Text("E-posta adresiniz") }
                 )
                 
@@ -139,7 +139,7 @@ fun LoginScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
-                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     supportingText = { Text("Şifrenizi girin") }
                 )
                 

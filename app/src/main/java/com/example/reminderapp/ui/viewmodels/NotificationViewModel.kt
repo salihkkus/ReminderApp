@@ -30,7 +30,11 @@ class NotificationViewModel @Inject constructor(
     private val _notifications = MutableStateFlow<List<ApiNotificationData>>(emptyList())
     val notifications: StateFlow<List<ApiNotificationData>> = _notifications.asStateFlow()
     
-    // Ajanda notları için state
+    // Ajanda notları için state - her bildirim için ayrı not
+    private val _ajandaNotlar = MutableStateFlow<Map<Int, AjandaNotData>>(emptyMap())
+    val ajandaNotlar: StateFlow<Map<Int, AjandaNotData>> = _ajandaNotlar.asStateFlow()
+    
+    // Tek bir ajanda notu için (geriye dönük uyumluluk)
     private val _ajandaNot = MutableStateFlow<AjandaNotData?>(null)
     val ajandaNot: StateFlow<AjandaNotData?> = _ajandaNot.asStateFlow()
     
@@ -68,6 +72,9 @@ class NotificationViewModel @Inject constructor(
                     onSuccess = { notificationList ->
                         _notifications.value = notificationList
                         Log.d("NotificationViewModel", "Loaded ${notificationList.size} notifications")
+                        
+                        // Her bildirim için ajanda notunu yükle
+                        loadAjandaNotlarForNotifications(notificationList)
                     },
                     onFailure = { error ->
                         Log.e("NotificationViewModel", "Error loading notifications", error)
@@ -80,6 +87,46 @@ class NotificationViewModel @Inject constructor(
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+    
+    // Her bildirim için ajanda notlarını yükle
+    private fun loadAjandaNotlarForNotifications(notifications: List<ApiNotificationData>) {
+        val token = tokenManager.getToken()
+        if (token.isNullOrBlank()) return
+        
+        viewModelScope.launch {
+            val ajandaNotlarMap = mutableMapOf<Int, AjandaNotData>()
+            
+            notifications.forEach { notification ->
+                try {
+                    // Kaydedilmiş not ID'sini kontrol et
+                    val savedNotId = userPreferences.getAjandaNotId(notification.id)
+                    val notId = savedNotId ?: notification.id
+                    
+                    val result = repository.getAjandaNotById(
+                        token = "Bearer $token",
+                        id = notId
+                    )
+                    
+                    result.fold(
+                        onSuccess = { response ->
+                            if (response.data != null) {
+                                ajandaNotlarMap[notification.id] = response.data
+                                Log.d("NotificationViewModel", "Loaded ajanda not for notification ${notification.id}")
+                            }
+                        },
+                        onFailure = { error ->
+                            Log.d("NotificationViewModel", "No ajanda not found for notification ${notification.id}")
+                        }
+                    )
+                } catch (e: Exception) {
+                    Log.d("NotificationViewModel", "Error loading ajanda not for notification ${notification.id}")
+                }
+            }
+            
+            _ajandaNotlar.value = ajandaNotlarMap
+            Log.d("NotificationViewModel", "Loaded ${ajandaNotlarMap.size} ajanda notlar")
         }
     }
     

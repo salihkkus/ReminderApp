@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reminderapp.data.model.ApiNotificationData
+import com.example.reminderapp.data.model.AjandaNotData
 import com.example.reminderapp.ui.theme.ReminderappTheme
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -26,6 +27,7 @@ fun NotificationItem(
     onEdit: () -> Unit,
     isPrioritized: Boolean = false,
     onTogglePriority: () -> Unit = {},
+    ajandaNot: AjandaNotData? = null,
     modifier: Modifier = Modifier
 ) {
     val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
@@ -103,6 +105,18 @@ fun NotificationItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
                 )
+                
+                // Ajanda notu göster (diğer alanlarla aynı stil)
+                if (!ajandaNot?.notlar.isNullOrBlank()) {
+                    Text(
+                        text = "Not: ${ajandaNot?.notlar}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
             
             // Aksiyon butonları
@@ -157,7 +171,12 @@ fun NotificationItemPreview() {
                 ajandaDosya = emptyList()
             ),
             onDelete = { },
-            onEdit = { }
+            onEdit = { },
+            ajandaNot = AjandaNotData(
+                ajandaId = "1",
+                id = 1,
+                notlar = "Müşteri ile görüşme yapıldı. Detaylar takip edilecek."
+            )
         )
     }
 }

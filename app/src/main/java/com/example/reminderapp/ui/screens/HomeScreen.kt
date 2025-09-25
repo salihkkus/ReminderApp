@@ -46,6 +46,7 @@ fun HomeScreen(
     val priorityIds by notificationViewModel.priorityIds.collectAsState()
     val isLoading by notificationViewModel.isLoading.collectAsState()
     val error by notificationViewModel.error.collectAsState()
+    val ajandaNotlar by notificationViewModel.ajandaNotlar.collectAsState()
     
     
 
@@ -432,7 +433,8 @@ fun HomeScreen(
                                 onDelete = { notificationViewModel.deleteNotification(notification) },
                                 onEdit = { navController.navigate("update_notification/${notification.id}") },
                                 isPrioritized = priorityIds.contains(notification.id),
-                                onTogglePriority = { notificationViewModel.togglePriority(notification.id) }
+                                onTogglePriority = { notificationViewModel.togglePriority(notification.id) },
+                                ajandaNot = ajandaNotlar[notification.id]
                             )
                         }
                         
